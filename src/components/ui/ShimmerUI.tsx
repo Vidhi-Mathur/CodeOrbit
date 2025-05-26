@@ -1,0 +1,80 @@
+const ShimmerEffect = ({ className = "" }) => {
+    return (
+        <div className={`animate-pulse relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent ${className}`}></div>
+    )
+}
+
+export const ShimmerProfile = () => {
+    return (
+        <div className="bg-white rounded-xl shadow-md overflow-hidden w-[95%] ml-auto -mt-[75px] relative">
+            <div className="bg-[#1A1B2E] p-5 text-white">
+                <div className="flex items-center gap-4">
+                    <ShimmerEffect className="h-8 w-40 bg-gray-700 rounded-md" />
+                    <ShimmerEffect className="h-6 w-32 bg-gray-700 rounded-md" />
+                </div>
+            </div>
+            <div className="p-5">
+                <div className="mb-6 space-y-2">
+                    <ShimmerEffect className="h-4 w-3/4 bg-gray-200 rounded-md" />
+                    <ShimmerEffect className="h-4 w-full bg-gray-200 rounded-md" />
+                </div>
+                <div className="flex flex-row gap-4 mb-6">
+                    <div className="flex-1 bg-cyan-200 p-4 rounded-lg text-center space-y-2">
+                        <ShimmerEffect className="h-6 w-16 bg-gray-300 rounded-md mx-auto" />
+                        <ShimmerEffect className="h-4 w-24 bg-gray-300 rounded-md mx-auto" />
+                    </div>
+                    <div className="flex-1 bg-blue-200 p-4 rounded-lg text-center space-y-2">
+                        <ShimmerEffect className="h-6 w-16 bg-gray-300 rounded-md mx-auto" />
+                        <ShimmerEffect className="h-4 w-24 bg-gray-300 rounded-md mx-auto" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <ShimmerEffect className="w-4 h-4 bg-gray-300 rounded-full" />
+                            </div>
+                            <div className="space-y-1">
+                                <ShimmerEffect className="h-3 w-20 bg-gray-200 rounded-md" />
+                                <ShimmerEffect className="h-4 w-28 bg-gray-200 rounded-md" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export const ShimmerRepo = () => {
+    return (
+        <div className="space-y-4 px-3 mb-4">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white border border-cyan-300/70 rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-[#1A1B2E] px-5 py-4">
+                        <ShimmerEffect className="h-5 w-40 bg-gray-700 rounded-md" />
+                    </div>
+                    <div className="bg-white px-5 py-4 space-y-4">
+                        <div className="space-y-2">
+                            <ShimmerEffect className="h-4 w-full bg-gray-200 rounded-md" />
+                            <ShimmerEffect className="h-4 w-3/4 bg-gray-200 rounded-md" />
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                            <ShimmerEffect className="h-4 w-24 bg-gray-200 rounded-md" />
+                            <ShimmerEffect className="h-4 w-28 bg-gray-200 rounded-md" />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {[1, 2, 3].map((t) => (
+                                <ShimmerEffect key={t} className="h-6 w-16 bg-cyan-100 rounded-lg"/>
+                            ))}
+                        </div>
+                        <div className="flex gap-3">
+                            <ShimmerEffect className="h-10 w-full bg-blue-100 rounded-lg" />
+                            <ShimmerEffect className="h-10 w-full bg-gray-100 rounded-lg" />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+};
