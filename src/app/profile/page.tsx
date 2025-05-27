@@ -3,10 +3,11 @@ import DevStats from "@/components/dev/DevStats"
 import { GitHubProfile } from "@/components/dev/github/GitHubProfile"
 import { GitHubRepo } from "@/components/dev/github/GitHubRepo"
 import DSAStats from "@/components/dsa/DSAStats"
+import { LeetCodeProfile } from "@/components/dsa/leetcode/LeetCodeProfile"
 import { CurvedNav } from "@/components/ui/CuvedNav"
 import { ShimmerProfile, ShimmerRepo } from "@/components/ui/ShimmerUI"
 import { infoLinks, profileConstants } from "@/constants/profileConstant"
-import type { GitHubProfileInterface, GitHubRepoInterface } from "@/interfaces/profileInterfaces"
+import { LeetcodeContestInterface, LeetCodeProfileInterface, type GitHubProfileInterface, type GitHubRepoInterface } from "@/interfaces/profileInterfaces"
 import axios from "axios"
 import Image from "next/image"
 import Link from "next/link"
@@ -14,9 +15,11 @@ import { useState } from "react"
 
 const Profile = () => {
     const [activeTab, setActiveTab] = useState(profileConstants[0].image);
-    const [profile, setProfile] = useState<GitHubProfileInterface | null>(null)
+    const [githubProfile, setGithubProfile] = useState<GitHubProfileInterface | null>(null)
     const [repos, setRepos] = useState<GitHubRepoInterface[]>([])
-    const [isLoading, setIsLoading] = useState(false)
+    const [leetcodeProfile, setLeetcodeProfile] = useState<LeetCodeProfileInterface | null>(null);
+    const [contest, setContest] = useState<LeetcodeContestInterface>();
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const handleClick = async(info: string) => {
         if(info === "github"){
@@ -25,7 +28,7 @@ const Profile = () => {
             try {
                 const response =  await axios.get('/api/dev/github/Vidhi-Mathur')
                 const { profileResponse, reposResponse } = response.data
-                setProfile(profileResponse)
+                setGithubProfile(profileResponse)
                 setRepos(reposResponse)
             } 
             catch(err: any){
@@ -37,9 +40,27 @@ const Profile = () => {
                 setIsLoading(false)
             }
         }
+        else if(info === "leetcode"){
+            setIsLoading(true)
+            setError(null)
+            try {
+                const response = await axios.get('/api/dsa/leetcode/VidhiMathur')
+                const { profileResponse, contestResponse } = response.data
+                setLeetcodeProfile(profileResponse)
+                setContest(contestResponse)
+            } 
+            catch(err: any){
+                console.error("API call failed", err)
+                let message = err.response?.data?.error || "Failed to load Leetcode profile"
+                setError(message)
+            } 
+            finally{
+                setIsLoading(false)
+            }
+        }
     }
     return (
-      <div className="fixed flex min-h-screen w-full">
+      <div className="flex h-screen w-full overflow-hidden">
         <div className="flex flex-col w-full md:w-3/4">
             <div className="p-6 bg-white h-[calc(5/12*100vh)] pt-[80px] relative">
                 <About />
@@ -47,15 +68,24 @@ const Profile = () => {
                   <CurvedNav activeTab={activeTab} setActiveTab={setActiveTab}/>
                 </div>
             </div>
-            <div className="bg-blue-200 h-[calc(3/4*100vh)]">
-                {activeTab === profileConstants[0].image && <DSAStats />}
+            <div className="bg-blue-200 h-[calc(3/4*100vh)] overflow-y-auto scrollbar-hide">
+                {activeTab === profileConstants[0].image && (
+                    <>
+                    <DSAStats onClick={handleClick}/>
+                    <div className="flex-1 m-6 -mt-95">
+                        {isLoading && <ShimmerProfile />}
+                        {error && <div className="-mt-20 bg-red-50 ml-12 p-4 rounded-lg border border-red-200 text-red-700">{error}</div>}
+                        {!isLoading && !error && leetcodeProfile && <LeetCodeProfile profile={leetcodeProfile} />}
+                    </div>
+                    </>
+                )}
                 {activeTab === profileConstants[1].image && (
                     <>
                     <DevStats onClick={handleClick} />
                     <div className="flex-1 m-6">
                         {isLoading && <ShimmerProfile />}
                         {error && <div className="-mt-20 bg-red-50 ml-12 p-4 rounded-lg border border-red-200 text-red-700">{error}</div>}
-                        {!isLoading && !error && profile && <GitHubProfile profile={profile} />}
+                        {!isLoading && !error && githubProfile && <GitHubProfile profile={githubProfile} />}
                     </div>
                     </>
                 )}
