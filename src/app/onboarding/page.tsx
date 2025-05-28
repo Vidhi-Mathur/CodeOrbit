@@ -1,6 +1,6 @@
 "use client"
 import axios from "axios"
-import { useState } from "react"
+import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import type { FormDataInterface } from "@/interfaces/onboardingInterface"
@@ -67,7 +67,7 @@ export default function OnboardingPage() {
         try {
             const response = await axios.post("/api/onboarding", formData)
             if(response.status === 200){
-                router.push("/profile")
+                router.push(`/profile/${formData.basicDetails.username}`)
             }
         } 
         catch (err) {
