@@ -34,7 +34,7 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
                     {infoLinks.map((info) => { 
                         const href = getRedirection(info)
                         return (
-                            <Link href={href} key={info} className="p-3 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white flex items-center justify-center">
+                            <Link href={href} key={info} className="p-3 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white flex items-center justify-center" target="_blank" rel="noopener noreferrer">
                                 <Image src={`/common/${info}.svg`} width={24} height={24} alt={info} />
                             </Link>
                         )
