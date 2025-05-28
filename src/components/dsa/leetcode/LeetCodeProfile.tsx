@@ -8,9 +8,8 @@ export const LeetCodeProfile = ({ profile }: LeetCodeProfileProps) => {
     <div className="bg-white rounded-xl shadow-md overflow-hidden w-[95%] ml-auto -mt-[75px] relative">
         <div className="bg-[#1A1B2E] p-5 text-white">
             <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold">{profile.realName}</h2>
-                <Link href={`https://leetcode.com/u/${profile.username}`} target="_blank" rel="noopener noreferrer" className="text-cyan-200 hover:text-white transition-colors">
-                    {`(@${profile.username})`}
+                <Link href={`https://leetcode.com/u/${profile.username}`} target="_blank" rel="noopener noreferrer" className="text-white hover:text-cyan-200 transition-colors">
+                    <h2 className="text-2xl font-bold underline">{`@${profile.username}`}</h2>
                 </Link>
             </div>
         </div>

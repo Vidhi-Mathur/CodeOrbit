@@ -10,7 +10,6 @@ export const ShimmerProfile = () => {
             <div className="bg-[#1A1B2E] p-5 text-white">
                 <div className="flex items-center gap-4">
                     <ShimmerEffect className="h-8 w-40 bg-gray-700 rounded-md" />
-                    <ShimmerEffect className="h-6 w-32 bg-gray-700 rounded-md" />
                 </div>
             </div>
             <div className="p-5">
