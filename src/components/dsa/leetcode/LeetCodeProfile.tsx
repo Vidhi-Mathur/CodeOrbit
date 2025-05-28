@@ -1,10 +1,9 @@
 import Link from "next/link"
-import { Award, Star, LockKeyholeOpen, Check } from 'lucide-react';
+import { Award, Star, LockKeyholeOpen } from 'lucide-react';
 import type { LeetCodeProfileProps } from "@/interfaces/profileInterfaces"
 import Image from "next/image";
 
 export const LeetCodeProfile = ({ profile }: LeetCodeProfileProps) => {
-    console.log("LeetCode Profile:", profile);
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden w-[95%] ml-auto -mt-[75px] relative">
         <div className="bg-[#1A1B2E] p-5 text-white">
