@@ -43,7 +43,7 @@ const UserSchema = new schema({
             github: String
         },
         others: {
-            portfolio: String,
+            website: String,
             linkedin: String,
             X: String
         }

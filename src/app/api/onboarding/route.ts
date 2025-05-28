@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
                     github: development.github
                 },
             others: {
-                portfolio: social.website,
+                website: social.website,
                 linkedin: social.linkedin,
                 X: social.twitter
             }
