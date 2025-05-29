@@ -2,11 +2,12 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = ["/profile", "/onboarding"];
+const protectedRoutes = ["/onboarding"];
 const onboardingRoute = "/onboarding";
 
 export async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.SECRET_KEY });
+    const username = await token?.username
     const url = req.nextUrl.clone();
 
     //Not logged in and accessing protected route
@@ -23,12 +24,12 @@ export async function middleware(req: NextRequest) {
 
     //onboarded and trying to access /onboarding, redirect away
     if(token && token.isOnboarded === true && url.pathname === onboardingRoute){
-        url.pathname = "/profile"; 
+        url.pathname = `/profile/${username}`; 
         return NextResponse.redirect(url);
     }
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/profile", "/onboarding"]
+    matcher: ["/onboarding"]
 };
