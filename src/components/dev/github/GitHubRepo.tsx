@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { GitHubRepoInterface } from "@/interfaces/profileInterfaces"
+import type { GitHubRepoInterface } from "@/interfaces/dev/github/githubInterface"
 import { Code2, ExternalLink, Calendar } from "lucide-react"
 import { formatDate } from "@/lib/helper"
 

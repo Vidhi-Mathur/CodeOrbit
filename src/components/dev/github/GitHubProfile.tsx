@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { calculateYears, formatDate } from "@/lib/helper"
 import { MapPin, Building2, CalendarDays, AlarmClock } from 'lucide-react';
-import type { GitHubProfileProps } from "@/interfaces/profileInterfaces"
+import type { GitHubProfileProps } from "@/interfaces/dev/github/githubInterface"
 
 export const GitHubProfile = ({ profile }: GitHubProfileProps) => {
   return (
