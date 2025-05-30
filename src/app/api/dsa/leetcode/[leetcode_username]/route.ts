@@ -1,4 +1,4 @@
-import { LeetcodeContestInterface, LeetCodeProfileInterface } from '@/interfaces/profileInterfaces';
+import { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeProfileInterface } from '@/interfaces/dsa/leetcode/leetcodeInterface';
 import axios from 'axios'
 import { NextRequest } from 'next/server';
 
@@ -21,7 +21,6 @@ const profileQuery = `
                     submissions
                 }
             }
-            submissionCalendar
             badges {
                 id
                 displayName
@@ -47,6 +46,19 @@ const profileQuery = `
         }
     `;
 
+    const calendarQuery = `
+        query userProfileCalendar($username: String!, $year: Int) {
+            matchedUser(username: $username) {
+                userCalendar(year: $year) {
+                    activeYears
+                    streak
+                    totalActiveDays
+                    submissionCalendar
+                }
+            }
+        }
+    `
+
 export async function GET(req: NextRequest, { params }: { params: { leetcode_username: string } }) {
     const { leetcode_username } = params;
 
@@ -59,9 +71,10 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
             'Content-Type': 'application/json',
             Referer: `https://leetcode.com/${leetcode_username}/`,
         }
-        const [profileRes, contestRes] = await Promise.all([
+        const [profileRes, contestRes, submissionCalendarRes] = await Promise.all([
             axios.post('https://leetcode.com/graphql', { query: profileQuery, variables: { leetcode_username } }, { headers }),
             axios.post('https://leetcode.com/graphql', { query: contestQuery, variables: { leetcode_username } }, { headers }),
+            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year: new Date().getFullYear() } }, { headers }),
         ]);
 
         const matchedUser = profileRes.data.data?.matchedUser;
@@ -84,7 +97,6 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
             })),
             submissionStats: matchedUser.submitStats?.acSubmissionNum || [],
             languageStats: matchedUser.languageProblemCount || [],
-            submissionCalendar: matchedUser.submissionCalendar || {},
         };
 
         const contest = contestRes.data.data?.userContestRanking;
@@ -96,7 +108,17 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
             totalParticipants: contest.totalParticipants,
             topPercentage: contest.topPercentage
         }
-        return new Response(JSON.stringify({ profileResponse, contestResponse }), { status: 200 })
+
+        const submissionCalendar = submissionCalendarRes.data.data?.matchedUser?.userCalendar;
+
+        const submissionCalendarResponse: LeetcodeCalendarInterface = {
+            submissionCalendar: submissionCalendar.submissionCalendar || {},
+            streak: submissionCalendar.streak || 0,
+            totalActiveDays: submissionCalendar.totalActiveDays || 0,
+            activeYears: submissionCalendar.activeYears || []
+        }
+        
+        return new Response(JSON.stringify({ profileResponse, contestResponse, submissionCalendarResponse }), { status: 200 })
     } 
     catch (err: any){
         console.error("Leetcode GraphQL Error:", JSON.stringify(err.response?.data || err.message, null, 2))
