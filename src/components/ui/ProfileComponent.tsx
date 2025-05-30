@@ -12,11 +12,12 @@ import { useGitHub } from "@/hooks/useGitHub"
 import { useLeetCode } from "@/hooks/useLeetCode"
 import { ProfileComponentProps } from "@/interfaces/profileInterfaces"
 import { useEffect, useState } from "react"
+import { LeetcodeDetail } from "../dsa/leetcode/LeetCodeDetail"
 
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
   const [activeTab, setActiveTab] = useState(profileConstants[0].image)
   const { githubProfile, repos, loading: githubLoading, error: githubError, fetchGitHubData } = useGitHub(user.platforms.dev.github)
-  const { leetcodeProfile, loading: leetcodeLoading, error: leetcodeError, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
+  const { leetcodeProfile, contest, submissionCalendar, loading: leetcodeLoading, error: leetcodeError, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
 
   useEffect(() => {
     if (activeTab === profileConstants[0].image) fetchLeetCodeData()
@@ -54,16 +55,23 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
                       </>
                   )}
               </div>
-          </div>
-          <div className="hidden md:block md:w-1/4 bg-cyan-200 pt-[80px] overflow-y-auto h-screen scrollbar-hide">
-              {activeTab === profileConstants[1].image && (
-                  <>
-                  {githubLoading && <ShimmerRepo />}
-                  {githubError && <div className="bg-red-50 p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700">{githubError}</div>}
-                  {!githubLoading && !githubError && repos && <GitHubRepo repos={repos} />}
-                  </>
-              )}
-          </div>
+            </div>
+            <div className="hidden md:block md:w-1/4 bg-cyan-200 pt-[80px] overflow-y-auto h-screen scrollbar-hide">
+                {activeTab === profileConstants[0].image && (
+                    <>
+                    {leetcodeLoading && <ShimmerRepo />}
+                    {leetcodeError && <div className="bg-red-50 p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700">{leetcodeError}</div>}
+                    {!leetcodeLoading && !leetcodeError && leetcodeProfile && contest && submissionCalendar && <LeetcodeDetail contest={contest} submissionCalendar={submissionCalendar} />}
+                    </>
+                )}
+                {activeTab === profileConstants[1].image && (
+                    <>
+                    {githubLoading && <ShimmerRepo />}
+                    {githubError && <div className="bg-red-50 p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700">{githubError}</div>}
+                    {!githubLoading && !githubError && repos && <GitHubRepo repos={repos} />}
+                    </>
+                )}
+            </div>
         </div>
       )
   }

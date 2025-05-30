@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Award, Star, LockKeyholeOpen } from 'lucide-react';
-import type { LeetCodeProfileProps } from "@/interfaces/profileInterfaces"
+import type { LeetCodeProfileProps } from "@/interfaces/dsa/leetcode/leetcodeInterface";
 import Image from "next/image";
 
 export const LeetCodeProfile = ({ profile }: LeetCodeProfileProps) => {
