@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import axios from 'axios';
-import type { GitHubProfileInterface, GitHubRepoInterface } from '@/interfaces/profileInterfaces';
+import type { GitHubProfileInterface, GitHubRepoInterface } from '@/interfaces/dev/github/githubInterface';
 
 const extractedRepos = (repo: any): GitHubRepoInterface => ({
     name: repo.name,
