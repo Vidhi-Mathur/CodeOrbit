@@ -14,9 +14,8 @@ export interface LeetCodeProfileProps {
     profile: LeetCodeProfileInterface
 }
 
-export interface LeetcodeDetailProps {
-  contest: LeetcodeContestInterface
-  submissionCalendar: LeetcodeCalendarInterface
+export interface SubmissionCalendarProps {
+  calendarMap: Record<number, LeetcodeCalendarInterface>
 }
 
 export interface LeetcodeCalendarInterface {
@@ -34,6 +33,10 @@ export interface LeetcodeContestInterface {
     totalParticipants: number
 }
 
+export interface ContestStatsProps {
+    contest: LeetcodeContestInterface
+}
+
 interface LeetCodeBadge {
     id: string
     name: string
@@ -49,4 +52,4 @@ interface LeetCodeSubmissionStat {
 interface LeetCodeLanguageStat {
     languageName: string
     problemsSolved: number
-}
+} 
