@@ -1,5 +1,7 @@
 import type { Profile } from "@/interfaces/authInterface"
 
+export const months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
 export const infoLinks: string[] = ["email", "linkedin", "twitter", "website"] as const 
 export type InfoLink = typeof infoLinks[number]
 
