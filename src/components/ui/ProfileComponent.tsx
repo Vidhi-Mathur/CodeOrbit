@@ -6,13 +6,14 @@ import DSAStats from "@/components/dsa/DSAStats"
 import { LeetCodeProfile } from "@/components/dsa/leetcode/LeetCodeProfile"
 import { About } from "@/components/ui/About"
 import { CurvedNav } from "@/components/ui/CuvedNav"
-import { ShimmerProfile, ShimmerRepo } from "@/components/ui/ShimmerUI"
+import { ShimmerContest, ShimmerProfile, ShimmerRepo, ShimmerSubmissionCalendar } from "@/components/ui/ShimmerUI"
 import { profileConstants } from "@/constants/profileConstant"
 import { useGitHub } from "@/hooks/useGitHub"
 import { useLeetCode } from "@/hooks/useLeetCode"
-import { ProfileComponentProps } from "@/interfaces/profileInterfaces"
+import type { ProfileComponentProps } from "@/interfaces/profileInterfaces"
 import { useEffect, useState } from "react"
-import { LeetcodeDetail } from "../dsa/leetcode/LeetCodeDetail"
+import { LeetCodeContest } from "../dsa/leetcode/LeetCodeContest"
+import SubmissionCalendar from "../dsa/leetcode/SubmissionCalendar"
 
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
   const [activeTab, setActiveTab] = useState(profileConstants[0].image)
@@ -59,9 +60,23 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
             <div className="hidden md:block md:w-1/4 bg-cyan-200 pt-[80px] overflow-y-auto h-screen scrollbar-hide">
                 {activeTab === profileConstants[0].image && (
                     <>
-                    {leetcodeLoading && <ShimmerRepo />}
+                    {leetcodeLoading && (
+                        <>
+                        <ShimmerSubmissionCalendar />
+                        <ShimmerContest />
+                        </>
+                    )}
                     {leetcodeError && <div className="bg-red-50 p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700">{leetcodeError}</div>}
-                    {!leetcodeLoading && !leetcodeError && leetcodeProfile && contest && submissionCalendar && <LeetcodeDetail contest={contest} submissionCalendar={submissionCalendar} />}
+                    {!leetcodeLoading && !leetcodeError && (
+                        <>
+                        {submissionCalendar && <SubmissionCalendar calendarMap={
+                            typeof submissionCalendar === 'object' && 'submissionCalendar' in submissionCalendar? { 
+                                [new Date().getFullYear()]: submissionCalendar 
+                            }: submissionCalendar
+                        }  />}
+                        {contest && <LeetCodeContest contest={contest} />}
+                        </>
+                    )}
                     </>
                 )}
                 {activeTab === profileConstants[1].image && (
