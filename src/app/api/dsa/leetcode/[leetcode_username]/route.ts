@@ -1,4 +1,4 @@
-import { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeProfileInterface } from '@/interfaces/dsa/leetcode/leetcodeInterface';
+import type { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeProfileInterface } from '@/interfaces/dsa/leetcode/leetcodeInterface';
 import axios from 'axios'
 import { NextRequest } from 'next/server';
 
@@ -71,10 +71,10 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
             'Content-Type': 'application/json',
             Referer: `https://leetcode.com/${leetcode_username}/`,
         }
-        const [profileRes, contestRes, submissionCalendarRes] = await Promise.all([
+        const [profileRes, contestRes, initialCalendarRes] = await Promise.all([
             axios.post('https://leetcode.com/graphql', { query: profileQuery, variables: { leetcode_username } }, { headers }),
             axios.post('https://leetcode.com/graphql', { query: contestQuery, variables: { leetcode_username } }, { headers }),
-            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year: new Date().getFullYear() } }, { headers }),
+            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year: new Date().getFullYear() } }, { headers })
         ]);
 
         const matchedUser = profileRes.data.data?.matchedUser;
@@ -109,16 +109,32 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
             topPercentage: contest.topPercentage
         }
 
-        const submissionCalendar = submissionCalendarRes.data.data?.matchedUser?.userCalendar;
+        let initialCalendarResponse = initialCalendarRes.data.data?.matchedUser?.userCalendar;
 
-        const submissionCalendarResponse: LeetcodeCalendarInterface = {
-            submissionCalendar: submissionCalendar.submissionCalendar || {},
-            streak: submissionCalendar.streak || 0,
-            totalActiveDays: submissionCalendar.totalActiveDays || 0,
-            activeYears: submissionCalendar.activeYears || []
-        }
+        const activeYears: number[] = (initialCalendarResponse.activeYears || []).sort((a: any, b: any) => b - a);
+        const selectedYear = activeYears.slice(0, 5);
+
+        //Map for past 5 active years
+        const calendarPromises = selectedYear.map((year: number) => 
+            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year } }, { headers })
+        )
+
+        const calendarResults = await Promise.all(calendarPromises)
+
+        const calendarMap: Record<number, LeetcodeCalendarInterface> = {}
+
+        calendarResults.forEach((res, index) => {
+            const year = selectedYear[index];
+            const calendar = res.data.data?.matchedUser?.userCalendar;
+            calendarMap[year] = {
+                submissionCalendar: calendar.submissionCalendar || {},
+                streak: calendar.streak || 0,
+                totalActiveDays: calendar.totalActiveDays || 0,
+                activeYears: calendar.activeYears || []
+            }
+        })
         
-        return new Response(JSON.stringify({ profileResponse, contestResponse, submissionCalendarResponse }), { status: 200 })
+        return new Response(JSON.stringify({ profileResponse, contestResponse, submissionCalendarResponse: calendarMap }), { status: 200 })
     } 
     catch (err: any){
         console.error("Leetcode GraphQL Error:", JSON.stringify(err.response?.data || err.message, null, 2))
