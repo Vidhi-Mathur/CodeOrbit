@@ -1,5 +1,5 @@
 "use client"
-import { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
+import type { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
 import axios from "axios"
 import { useState } from "react"
 

@@ -1,5 +1,5 @@
 "use client"
-import { GitHubProfileInterface, GitHubRepoInterface } from "@/interfaces/dev/githubInterface"
+import type { GitHubProfileInterface, GitHubRepoInterface } from "@/interfaces/dev/github/githubInterface"
 import axios from "axios"
 import { useState } from "react"
 
