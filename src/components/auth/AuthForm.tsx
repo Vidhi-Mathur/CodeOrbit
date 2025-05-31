@@ -51,7 +51,7 @@ export const AuthForm: React.FC<AuthProps> = ({heading, subheading, redirectLink
                             <p className="text-gray-600 mb-2">Or continue with</p>
                             <div className="flex justify-center gap-4">
                                 {providers.map((provider) => (
-                                    <button onClick={() => signIn(provider, { callbackUrl: "/profile" })} key={provider} className="p-2 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white">
+                                    <button onClick={() => signIn(provider, { callbackUrl: "/" })} key={provider} className="p-2 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white">
                                         <Image src={`/common/${provider}.svg`} width={30} height={30} alt={`${provider}`} />
                                     </button>
                                 ))}

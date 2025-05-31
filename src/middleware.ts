@@ -24,12 +24,20 @@ export async function middleware(req: NextRequest) {
 
     //onboarded and trying to access /onboarding, redirect away
     if(token && token.isOnboarded === true && url.pathname === onboardingRoute){
-        url.pathname = `/profile/${username}`; 
+        url.pathname = `/profile/${username}`;
+        console.log("Redirecting to profile page"); 
         return NextResponse.redirect(url);
     }
+    
+    //Redirect onboarded users landing on the root page to /profile/:username
+    if(token && token.isOnboarded === true && url.pathname === "/") {
+        url.pathname = `/profile/${username}`;
+        return NextResponse.redirect(url);
+    }
+
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/onboarding"]
+    matcher: ["/", "/onboarding", "/profile/:path*"]
 };
