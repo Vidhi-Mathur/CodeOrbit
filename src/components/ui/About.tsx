@@ -1,6 +1,8 @@
 import { infoLinks } from "@/constants/profileConstant"
-import { AboutProps } from "@/interfaces/profileInterfaces";
-import { Dot, GraduationCap, MapPinIcon } from "lucide-react";
+import type { AboutProps } from "@/interfaces/profileInterfaces";
+import SchoolIcon from '@mui/icons-material/School';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import Image from "next/image"
 import Link from "next/link";
 
@@ -36,34 +38,40 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
                         <div className="flex flex-col md:flex-row justify-between gap-4">
                             <div className="space-y-3 md:w-[65%]">
                                 <div className="flex items-start gap-2">
-                                    <GraduationCap className="w-6 h-6" />
-                                    <div>
-                                        <h3 className="font-medium text-gray-900">{education.degree}</h3>
-                                        <h3 className="text-gray-500 flex items-center">
-                                            <span className="inline-flex items-center mr-1"><Dot /></span>
+                                    <SchoolIcon className="w-6 h-6" />
+                                    <div className="text-gray-700">
+                                        <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mt-1">{education.degree}</h3>
+                                        <h3 className="flex items-center">
+                                            <span className="inline-flex items-center mr-2">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </span>
                                             With Specialization in {education.branch}
                                         </h3>
-                                        <h3 className="text-gray-500 flex items-center">
-                                            <span className="inline-flex items-center mr-1"><Dot /></span>
+                                        <h3 className="flex items-center">
+                                            <span className="inline-flex items-center mr-2">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </span>
                                             {`${Number(education.gradYear) < new Date().getFullYear() ? "Graduated in" : "To be graduated in"} ${education.gradYear}`}
                                         </h3>
-                                        <h3 className="text-gray-700 flex items-center">
-                                            <span className="inline-flex items-center mr-1"><Dot /></span>
+                                        <h3 className="flex items-center">
+                                            <span className="inline-flex items-center mr-2">
+                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                            </span>
                                             From {education.college}
                                         </h3>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <Image src="/common/current_profile.svg" width={20} height={20} alt="Currentprofile" className="ml-1" />
+                                    <BusinessCenterIcon />
                                     <div>
-                                        <h3 className="font-medium text-gray-900">{education.current_profile}</h3>
+                                        <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mt-1">{education.current_profile}</h3>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-2 md:w-[30%] md:ml-auto md:mr-4">
-                                <MapPinIcon className="w-6 h-6 mt-1" />
+                            <div className="flex items-start gap-1 md:w-[30%] md:ml-auto md:mr-4">
+                                <LocationOnIcon className="mt-1" />
                                 <div>
-                                    <h3 className="font-medium text-gray-900 mt-1">{education.location}</h3>
+                                    <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mt-2">{education.location}</h3>
                                 </div>
                             </div>
                         </div>
