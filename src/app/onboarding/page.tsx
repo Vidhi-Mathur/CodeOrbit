@@ -1,6 +1,6 @@
 "use client"
 import axios from "axios"
-import { use, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import type { FormDataInterface } from "@/interfaces/onboardingInterface"
