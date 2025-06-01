@@ -23,7 +23,15 @@ const poppins = Poppins({
 
 export const AuthForm: React.FC<AuthProps> = ({heading, subheading, redirectLink, redirectText, crendentials}) => {
     return (
-        <div className="relative flex items-center justify-center h-screen">
+        <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 -z-10">
+                <Image src="/bg/bg3.png" alt="Background" fill className="object-cover opacity-90" priority />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/40 to-cyan-50/90" />
+                <div className="absolute top-0 left-0 w-full h-full">
+                    <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-200/30 rounded-full blur-3xl animate-pulse delay-1000" />
+                </div>
+            </div>
             <div className="w-7/12 h-3/4 mt-10 flex shadow-lg rounded-lg overflow-hidden text-black bg-[#c1d5e9]">
                 <div className="relative h-full">
                     <Image src="/bg/auth_pc.png" width={347.2} height={100} alt="Background" className="h-full object-cover" />
@@ -51,7 +59,7 @@ export const AuthForm: React.FC<AuthProps> = ({heading, subheading, redirectLink
                             <p className="text-gray-600 mb-2">Or continue with</p>
                             <div className="flex justify-center gap-4">
                                 {providers.map((provider) => (
-                                    <button onClick={() => signIn(provider, { callbackUrl: "/" })} key={provider} className="p-2 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white">
+                                    <button onClick={() => signIn(provider, { callbackUrl: "/?redirect=true" })} key={provider} className="p-2 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white">
                                         <Image src={`/common/${provider}.svg`} width={30} height={30} alt={`${provider}`} />
                                     </button>
                                 ))}

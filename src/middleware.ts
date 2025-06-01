@@ -2,6 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+//Signup before accessing
 const protectedRoutes = ["/onboarding"];
 const onboardingRoute = "/onboarding";
 
@@ -10,28 +11,28 @@ export async function middleware(req: NextRequest) {
     const username = await token?.username
     const url = req.nextUrl.clone();
 
-    //Not logged in and accessing protected route
-    if(protectedRoutes.some(route => url.pathname.startsWith(route)) && !token) {
+    //Not logged in and accessing protected route, redirect to login
+    if(protectedRoutes.some(route => url.pathname.startsWith(route)) && !token){
         url.pathname = "/login";
         return NextResponse.redirect(url);
     }
 
-    //Logged in but not onboarded
-    if(token && token.isOnboarded === false && url.pathname !== onboardingRoute){
+    //Logged in but not onboarded yet
+    if(token && !token.isOnboarded && url.pathname !== onboardingRoute && url.pathname !== "/"){
         url.pathname = onboardingRoute;
         return NextResponse.redirect(url);
     }
 
-    //onboarded and trying to access /onboarding, redirect away
-    if(token && token.isOnboarded === true && url.pathname === onboardingRoute){
+    //Onboarded but still trying to accessing /onboarding, redirect to /profile/:username 
+    if(token && token.isOnboarded && url.pathname === onboardingRoute){
         url.pathname = `/profile/${username}`;
-        console.log("Redirecting to profile page"); 
         return NextResponse.redirect(url);
     }
-    
-    //Redirect onboarded users landing on the root page to /profile/:username
-    if(token && token.isOnboarded === true && url.pathname === "/") {
+
+    //Onboarded and trying to access home page with redirect query, redirect to /profile/:username
+    if(token && token.isOnboarded && url.pathname === "/" && url.searchParams.get("redirect") === "true"){
         url.pathname = `/profile/${username}`;
+        url.searchParams.delete("redirect");
         return NextResponse.redirect(url);
     }
 
@@ -39,5 +40,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/", "/onboarding", "/profile/:path*"]
+    matcher: ["/", "/onboarding"],
 };
