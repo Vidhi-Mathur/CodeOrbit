@@ -8,7 +8,7 @@ export const NavigationBar = async() => {
 const session = await getServerSession(authOptions);
   return (
     <div>
-        <div className="fixed top-0 left-0 z-100 flex items-center justify-between bg-white/40 backdrop-blur-md h-[72px] w-full px-2 pt-2 text-white">
+        <div className="fixed top-0 left-0 z-100 flex items-center justify-between backdrop-blur-md h-[72px] w-full px-2 pt-2 text-white">
             <div className="relative -left-1 h-24 w-24">
                 <Link href="/">
                     <Image src="/common/logo.png" alt="logo" fill className="object-contain" />
