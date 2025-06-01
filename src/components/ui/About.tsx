@@ -51,7 +51,7 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
                                             <span className="inline-flex items-center mr-2">
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                                             </span>
-                                            {`${Number(education.gradYear) < new Date().getFullYear() ? "Graduated in" : "To be graduated in"} ${education.gradYear}`}
+                                            {`${education.gradYear < new Date().getFullYear() ? "Graduated in" : "To be graduated in"} ${education.gradYear}`}
                                         </h3>
                                         <h3 className="flex items-center">
                                             <span className="inline-flex items-center mr-2">

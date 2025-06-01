@@ -21,7 +21,7 @@ export interface EducationInterface {
     degree: string
     branch: string
     college: string
-    gradYear: string
+    gradYear: number
     location: string
     currentProfile: string
 }

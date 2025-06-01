@@ -105,7 +105,7 @@ export const initialFormData: FormDataInterface = {
         degree: "", 
         branch: "", 
         college: "", 
-        gradYear: "", 
+        gradYear: new Date().getFullYear(),
         location: "", 
         currentProfile: ""
     },

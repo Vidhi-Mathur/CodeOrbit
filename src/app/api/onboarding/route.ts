@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
                 degree: education.degree,
                 branch: education.branch,
                 college: education.college,
-                gradYear: education.gradYear,
+                gradYear: Number(education.gradYear),
                 location: education.location,
                 current_profile: education.currentProfile
             },

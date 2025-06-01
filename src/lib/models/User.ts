@@ -25,7 +25,7 @@ const UserSchema = new schema({
         degree: String,
         branch: String,
         college: String,
-        gradYear: String,
+        gradYear: Number,
         location: String,
         current_profile: String
     },

@@ -44,7 +44,7 @@ interface EducationInterface {
     degree: string
     branch: string
     college: string
-    gradYear: string
+    gradYear: number
     location: string
     current_profile: string
 }
