@@ -1,55 +1,142 @@
-import mongoose from 'mongoose';
-const schema = mongoose.Schema;
+import mongoose from "mongoose"
+const schema = mongoose.Schema
 
 //Todo: Add validation, indexing for username may be
 const UserSchema = new schema({
-    name: String,
+    name: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
-    image: String,
-    authProvider: String,
-    authProviderId: String,
-    username: { 
-        type: String, 
-        unique: true, 
-        sparse: true 
+    image: {
+        type: String,
+        required: true,
+        default: "https://img.icons8.com/nolan/100/user-default.png"
+    },
+    authProvider: {
+        type: String,
+        required: true,
+        enum: ["google", "github", "twitter", "email"],
+    },
+    authProviderId: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    username: {
+        type: String,
+        unique: true,
+        required: function (this: any): boolean {
+            return this.isOnboarded 
+        },
     },
     isOnboarded: {
         type: Boolean,
-        default: false
+        default: false,
     },
     education: {
-        degree: String,
-        branch: String,
-        college: String,
-        gradYear: Number,
-        location: String,
-        current_profile: String
+        degree: {
+            type: String,
+            required: function (this: any) {
+                return this && this.isOnboarded
+            },
+        },
+        branch: {
+            type: String,
+            required: false,
+        },
+        college: {
+            type: String,
+            required: function (this: any) {
+                return this && this.isOnboarded
+            },
+        },
+        gradYear: {
+            type: Number,
+            required: function (this: any) {
+                return this && this.isOnboarded
+            },
+        },
+        location: {
+            type: String,
+            required: function (this: any) {
+                return this && this.isOnboarded
+            },
+        },
+        currentProfile: {
+            type: String,
+            required: function (this: any) {
+                return this && this.isOnboarded
+            },
+            enum: ["Student", "Fresher", "Working Professional", "Freelancer", "Other"],
+        },
     },
     platforms: {
         dsa: {
-            leetcode: String,
-            geeksforgeeks: String,
-            codeforces: String,
-            codechef: String,
-            hackerrank: String,
-            interviewbit: String,
-            codingninjas: String
+            leetcode: {
+                type: String,
+                required: function (this: any) {
+                    return this && this.isOnboarded
+                },
+            },
+            geeksforgeeks: {
+                type: String,
+                required: false,
+            },
+            codeforces: {
+                type: String,
+                required: false,
+            },
+            codechef: {
+                type: String,
+                required: false,
+            },
+            hackerrank: {
+                type: String,
+                equired: false,
+            },
+            interviewbit: {
+                type: String,
+                required: false,
+            },
+            codingninjas: {
+                type: String,
+                required: false,
+            },
         },
         dev: {
-            github: String
+            github: {
+                type: String,
+                required: function (this: any): boolean {
+                    //Access the parent document to check isOnboarded
+                    const parentDoc = this.ownerDocument ? this.ownerDocument() : null;
+                    return parentDoc ? parentDoc.isOnboarded : false;
+                },
+            },
         },
         others: {
-            website: String,
-            linkedin: String,
-            X: String
+            website: {
+                type: String,
+                required: false
+            },
+            linkedin: {
+                type: String,
+                required: function (this: any) {
+                    //Access the parent document to check isOnboarded
+                    const parentDoc = this.ownerDocument ? this.ownerDocument() : null;
+                    return parentDoc ? parentDoc.isOnboarded : false;
+                },
+            },
+            twitter: {
+                type: String,
+                required: false
+            }
         }
-    }
-}, {
-    timestamps: true
-})
+    },
+  }, {  timestamps: true })
 
-export default mongoose.models.User || mongoose.model('User', UserSchema)
+export default mongoose.models.User || mongoose.model("User", UserSchema)
