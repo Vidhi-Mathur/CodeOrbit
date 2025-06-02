@@ -90,8 +90,8 @@ export async function GET(req: NextRequest, { params }: { params: { github_usern
             }, }
         )
         const user = response.data?.data?.user;
-        if (!user){
-            return new Response(JSON.stringify({ error: "GitHub user not found" }), { status: 404 });
+        if(!user){
+            return new Response(JSON.stringify({ error: "GitHub User not found" }), { status: 404 });
         }
         const profileResponse: GitHubProfileInterface = {
             name: user.name,

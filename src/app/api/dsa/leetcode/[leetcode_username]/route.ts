@@ -62,7 +62,7 @@ const profileQuery = `
 export async function GET(req: NextRequest, { params }: { params: { leetcode_username: string } }) {
     const { leetcode_username } = params;
 
-    if (!leetcode_username){
+    if(!leetcode_username){
         return new Response(JSON.stringify({ error: "Username is required" }), { status: 400 });
     }
 
@@ -79,8 +79,8 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
 
         const matchedUser = profileRes.data.data?.matchedUser;
 
-        if(!matchedUser) {
-            return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 });
+        if(!matchedUser){
+            return new Response(JSON.stringify({ error: 'Leetcode User not found' }), { status: 404 });
         }
 
         const profileResponse: LeetCodeProfileInterface = {

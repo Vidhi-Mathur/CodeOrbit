@@ -33,10 +33,7 @@ export const authOptions: AuthOptions = {
         async signIn({ user, account }){
             await connectToDB()
             const existingUser = await User.findOne({ email: user.email })
-            if(existingUser){
-                console.log('User already exists')
-            }
-            else {
+            if(!existingUser){
                 await User.create({
                     name: user.name,
                     email: user.email,
