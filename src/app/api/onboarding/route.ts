@@ -13,37 +13,41 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { basicDetails, education, social, development, codingProfiles } = body
     try {
+        //Initial validation
+        if(!basicDetails?.username || !education?.degree || !education?.college || !education?.gradYear || !education?.location || !education?.currentProfile || !codingProfiles?.leetcode || !development?.github || !social?.linkedin){
+            return NextResponse.json({ message: "Missing required fields for onboarding" }, { status: 400 })
+        }
         const updatedUser = await User.findOneAndUpdate({ email: session.user.email }, {
-            name: basicDetails.name,
             username: basicDetails.username,
             isOnboarded: true,
             education: {
                 degree: education.degree,
-                branch: education.branch,
+                branch: education?.branch,
                 college: education.college,
                 gradYear: Number(education.gradYear),
                 location: education.location,
-                current_profile: education.currentProfile
+                currentProfile: education.currentProfile
             },
             platforms: {
                 dsa: {
                     leetcode: codingProfiles.leetcode ,
-                    geeksforgeeks: codingProfiles.geeksforgeeks,
-                    codeforces: codingProfiles.codeforces ,
-                    codechef: codingProfiles.codechef,
-                    hackerrank: codingProfiles.hackerrank ,
-                    interviewbit: codingProfiles.interviewbit,
-                    codingninjas: codingProfiles.codingninjas
+                    geeksforgeeks: codingProfiles?.geeksforgeeks,
+                    codeforces: codingProfiles?.codeforces,
+                    codechef: codingProfiles?.codechef,
+                    hackerrank: codingProfiles?.hackerrank,
+                    interviewbit: codingProfiles?.interviewbit,
+                    codingninjas: codingProfiles?.codingninjas
                 },
                 dev: {
                     github: development.github
                 },
-            others: {
-                website: social.website,
-                linkedin: social.linkedin,
-                X: social.twitter
+                others: {
+                    website: social?.website,
+                    linkedin: social.linkedin,
+                    twitter: social?.twitter
+                }
             }
-        }}, { new: true })
+        }, { new: true })
         return NextResponse.json({ message: "User updated successfully", user: updatedUser }, { status: 200 })
     } 
     catch(err){
