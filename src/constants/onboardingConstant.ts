@@ -1,12 +1,9 @@
-import type { BasicDetailsInterface, CodingProfilesInterface, DevelopmentInterface, EducationInterface, FieldConfig, FormDataInterface, SocialInterface } from "@/interfaces/onboardingInterface"
+import type { BasicDetailsInterface, FieldConfig, FormDataInterface } from "@/interfaces/onboardingInterface"
+import { CodingProfilesInterface, DevelopmentInterface, EducationInterface, InfoInterface } from "@/interfaces/profileInterfaces"
 
 export const totalSteps: number = 5
 
 export const basicDetailsFields: FieldConfig<BasicDetailsInterface>[] = [{
-        id: "name",
-        label: "Your name",
-        placeholder: "Enter your full name"
-    }, {
         id: "username",
         label: "Username",
         placeholder: "Enter your username"
@@ -40,91 +37,76 @@ export const educationFields: FieldConfig<EducationInterface>[] = [{
     }
 ]
 
-export const socialFields: FieldConfig<SocialInterface>[] = [{
+export const socialFields: FieldConfig<InfoInterface>[] = [{
         id: "twitter",
         label: "Twitter",
-        placeholder: "Your Twitter profile",
+        placeholder: "Your Twitter Username (without @)",
     }, {
         id: "linkedin",
         label: "LinkedIn",
-        placeholder: "Your LinkedIn profile",
+        placeholder: "Your LinkedIn Username",
     }, {
         id: "website",
         label: "Your Website",
-        placeholder: "Your personal website",
-    }, {
-        id: "email",
-        label: "Your Email",
-        placeholder: "Your email address",
+        placeholder: "Your personal website/blog/portfolio",
     }
 ]
 
 export const developmentFields: FieldConfig<DevelopmentInterface>[] = [{
     id: "github",
     label: "GitHub",
-    placeholder: "Your GitHub profile"
+    placeholder: "Your GitHub Username (no url)"
 }]
 
 export const codingProfilesFields: FieldConfig<CodingProfilesInterface>[] = [{
         id: "leetcode",
         label: "LeetCode Profile",
-        placeholder: "Your LeetCode profile"
+        placeholder: "Your LeetCode Username (no url)"
     }, {
         id: "geeksforgeeks",
         label: "GeeksForGeeks Profile",
-        placeholder: "Your GeeksForGeeks profile"
+        placeholder: "Your GeeksForGeeks Username"
     }, {
         id: "codeforces",
         label: "CodeForces Profile",
-        placeholder: "Your CodeForces profile"
+        placeholder: "Your CodeForces Username"
     }, {
         id: "codechef",
         label: "CodeChef Profile",
-        placeholder: "Your CodeChef profile"
+        placeholder: "Your CodeChef Username"
     }, {
         id: "hackerrank",
         label: "HackerRank Profile",
-        placeholder: "Your HackerRank profile"
+        placeholder: "Your HackerRank Username"
     }, {
         id: "interviewbit",
         label: "InterviewBit Profile",
-        placeholder: "Your InterviewBit profile"
+        placeholder: "Your InterviewBit Username"
     }, {
         id: "codingninjas",
         label: "CodingNinjas Profile",
-        placeholder: "Your CodingNinjas profile"
+        placeholder: "Your CodingNinjas Username"
     }
 ]
 
 export const initialFormData: FormDataInterface = {
     basicDetails: { 
-        name: "", 
         username: "" 
     },
     education: {
         degree: "", 
-        branch: "", 
         college: "", 
         gradYear: new Date().getFullYear(),
         location: "", 
         currentProfile: ""
     },
     social: { 
-        twitter: "", 
         linkedin: "", 
-        website: "", 
-        email: "" 
     },
     development: { 
         github: "" 
     },
     codingProfiles: {
-        leetcode: "", 
-        geeksforgeeks: "", 
-        codeforces: "", 
-        codechef: "",
-        hackerrank: "", 
-        interviewbit: "", 
-        codingninjas: ""
+        leetcode: ""
     }
 }
