@@ -4,9 +4,9 @@ export interface CurvedNavProps {
 }
 
 export interface AboutProps {
-    name?: string | null
-    username?: string | null
-    image?: string | null
+    name: string
+    username: string
+    image: string
     email: string
     education: EducationInterface
     info: InfoInterface
@@ -23,34 +23,38 @@ export interface ProfileComponentProps {
         isOnboarded: boolean
         education: EducationInterface,
         platforms: {
-            dsa: {
-                leetcode: string
-                geeksforgeeks: string
-                codeforces: string
-                codechef: string
-                hackerrank: string
-                interviewbit: string
-                codingninjas: string
-            }
-            dev: {
-                github: string
-            }
+            dsa: CodingProfilesInterface
+            dev: DevelopmentInterface
             others: InfoInterface
         }
     }
 };
 
-interface EducationInterface {
+export interface EducationInterface {
     degree: string
-    branch: string
+    branch?: string
     college: string
     gradYear: number
     location: string
-    current_profile: string
+    currentProfile: string
 }
 
-interface InfoInterface {
-    website: string,
+export interface DevelopmentInterface {
+    github: string
+}
+
+export interface CodingProfilesInterface {
+    leetcode: string
+    geeksforgeeks?: string,
+    codeforces?: string,
+    codechef?: string
+    hackerrank?: string
+    interviewbit?: string,
+    codingninjas?: string
+}
+
+export interface InfoInterface {
+    website?: string,
     linkedin: string,
-    X: string
+    twitter?: string
 }
