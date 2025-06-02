@@ -1,22 +1,22 @@
 import { infoLinks } from "@/constants/profileConstant"
-import type { AboutProps } from "@/interfaces/profileInterfaces";
+import type { AboutProps, InfoInterface } from "@/interfaces/profileInterfaces";
 import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import Image from "next/image"
 import Link from "next/link";
 
-export const About = ({ name = "User's Name", username = "User's Username", image, email, education, info }: AboutProps) => {
+export const About = ({ name, username, image, email, education, info }: AboutProps) => {
     let getRedirection = (key: string): string => {
         switch (key) {
             case "email":
                 return `mailto:${email}`;
             case "linkedin":
-                return `https://www.linkedin.com/in/${info.linkedin}` || "/";
+                return `https://www.linkedin.com/in/${info.linkedin}`;
             case "twitter":
-                return `https://x.com/${info.X}` || "/";
+                return info.twitter ? `https://x.com/${info.twitter}` : "/";
             case "website":
-                return `${info.website}` || "/";
+                return info.website || "/";
             default:
                 return "/";
         }
@@ -26,7 +26,7 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
             <div className="flex flex-col md:flex-row items-start md:items-start gap-2 justify-between">
                 <div className="flex flex-col gap-2">
                     <div className="relative rounded-full w-24 h-24 overflow-hidden">
-                        <Image className="object-cover" src={image || "/bg/profile.png"} alt="Profile" fill />
+                        <Image className="object-cover" src={image} alt="Profile" fill />
                     </div>
                     <div className="mt-2">
                         <h2 className="text-xl font-semibold">{name}</h2>
@@ -41,12 +41,14 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
                                     <SchoolIcon className="w-6 h-6" />
                                     <div className="text-gray-700">
                                         <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mt-1">{education.degree}</h3>
-                                        <h3 className="flex items-center">
-                                            <span className="inline-flex items-center mr-2">
-                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                            </span>
-                                            With Specialization in {education.branch}
-                                        </h3>
+                                        {education.branch && (
+                                            <h3 className="flex items-center">
+                                                <span className="inline-flex items-center mr-2">
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                                </span>
+                                                With Specialization in {education.branch}
+                                            </h3>
+                                        )}
                                         <h3 className="flex items-center">
                                             <span className="inline-flex items-center mr-2">
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
@@ -64,7 +66,7 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
                                 <div className="flex items-start gap-2">
                                     <BusinessCenterIcon />
                                     <div>
-                                        <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mt-1">{education.current_profile}</h3>
+                                        <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mt-1">{education.currentProfile}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -78,11 +80,12 @@ export const About = ({ name = "User's Name", username = "User's Username", imag
                     </div>
                 </div>
                 <div className="flex flex-col gap-2 -mt-4 md:-mt-4">
-                    {infoLinks.map((info) => { 
-                        const href = getRedirection(info)
+                    {infoLinks.map((key) => { 
+                        if((key !== "email" && !info[key as keyof InfoInterface])) return null;
+                        const href = getRedirection(key)
                         return (
-                            <Link href={href} key={info} className="p-3 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white flex items-center justify-center" target="_blank" rel="noopener noreferrer">
-                                <Image src={`/common/${info}.svg`} width={24} height={24} alt={info} />
+                            <Link href={href} key={key} className="p-3 rounded-2xl shadow-md hover:shadow-lg transition-shadow bg-white flex items-center justify-center" target="_blank" rel="noopener noreferrer">
+                                <Image src={`/common/${key}.svg`} width={24} height={24} alt={key} />
                             </Link>
                         )
                     })}
