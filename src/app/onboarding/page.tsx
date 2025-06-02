@@ -12,13 +12,22 @@ export default function OnboardingPage() {
     const [formData, setFormData] = useState<FormDataInterface>(initialFormData)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+    const changeHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target
+        //Clearing field error when user starts typing
+        if(fieldErrors[name]){
+            setFieldErrors((prev) => {
+                const newErrors = { ...prev }
+                delete newErrors[name]
+                return newErrors
+            })
+        }
         setFormData((prev) => {
         if(!prev) return prev
         const updatedSection = (section: any) => ({
             ...section,
-            [name]: value,
+            [name]: name === "gradYear" ? Number.parseInt(value) || new Date().getFullYear() : value,
         })
         switch (currentStep){
             case 1:
@@ -52,8 +61,35 @@ export default function OnboardingPage() {
         })
     }
 
+    const currentStepValidator = () => {
+    const errors: Record<string, string> = {}
+    switch (currentStep){
+        case 1:
+            if(!formData.basicDetails.username.trim())  errors.username = "Username is required"
+            break
+        case 2:
+            if(!formData.education.degree.trim()) errors.degree = "Degree is required"
+            if(!formData.education.college.trim()) errors.college = "College is required"
+            if(!formData.education.gradYear) errors.gradYear = "Graduation year is required"
+            if(!formData.education.location.trim()) errors.location = "Location is required"
+            if(!formData.education.currentProfile.trim()) errors.currentProfile = "Current profile is required"
+            break
+        case 3:
+            if(!formData.social.linkedin.trim()) errors.linkedin = "LinkedIn username is required"
+            break
+        case 4:
+            if(!formData.development.github.trim()) errors.github = "GitHub username is required"
+            break
+        case 5:
+            if(!formData.codingProfiles.leetcode.trim()) errors.leetcode = "LeetCode username is required"
+            break
+        }
+        setFieldErrors(errors)
+        return Object.keys(errors).length === 0
+    }
+
     const nextStep = () => {
-        if(currentStep < totalSteps) setCurrentStep(currentStep + 1)
+        if(currentStepValidator() && currentStep < totalSteps) setCurrentStep(currentStep + 1)
     }
 
     const prevStep = () => {
@@ -62,6 +98,7 @@ export default function OnboardingPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if(!currentStepValidator())  return
         setIsLoading(true)
         setError(null)
         try {
@@ -87,58 +124,105 @@ export default function OnboardingPage() {
                     <h2 className="text-2xl font-bold text-blue-800 mb-6">Basic Details</h2>
                     {basicDetailsFields.map((input) => (
                         <div key={input.id}>
-                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">{input.label}</label>
-                            <input type="text" id={input.id} name={input.id} value={formData.basicDetails[input.id]} onChange={handleInputChange} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900" placeholder={input.placeholder} required />
+                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
+                                {input.label} <span className="text-red-500">*</span>
+                            </label>
+                            <input type="text" id={input.id} name={input.id} value={formData.basicDetails[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300" }`} placeholder={input.placeholder} />
+                            {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
                         </div>
                     ))}
                 </div>
-            )
+            )   
         case 2:
-            return (
-                <div className="space-y-5">
-                    <h2 className="text-2xl font-bold text-blue-800 mb-6">Education Details</h2>
-                    {educationFields.map((input) => (
+             case 2:
+        return (
+            <div className="space-y-5">
+                <h2 className="text-2xl font-bold text-blue-800 mb-6">Education Details</h2>
+                {educationFields.map((input) => {
+                    const isRequired = ["degree", "college", "gradYear", "location", "currentProfile"].includes(input.id)
+                    if(input.id === "currentProfile"){
+                    return (
                         <div key={input.id}>
-                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">{input.label}</label>
-                            <input type="text" id={input.id} name={input.id} value={formData.education[input.id]} onChange={handleInputChange} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900" placeholder={input.placeholder} required />
+                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
+                                {input.label} {isRequired && <span className="text-red-500">*</span>}
+                            </label>
+                            <select id={input.id} name={input.id} value={formData.education[input.id]} onChange={(e) => changeHandler(e)} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300" }`}>
+                                <option value="">Select your current profile</option>
+                                <option value="Student">Student</option>
+                                <option value="Fresher">Fresher</option>
+                                <option value="Working Professional">Working Professional</option>
+                                <option value="Freelancer">Freelancer</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
                         </div>
-                    ))}
-                </div>
-            )
+                        )
+                }
+                return (
+                    <div key={input.id}>
+                        <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
+                            {input.label} {isRequired && <span className="text-red-500">*</span>}
+                        </label>
+                        <input type={input.id === "gradYear" ? "number" : "text"} id={input.id} name={input.id} value={formData.education[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300" }`} placeholder={input.placeholder} min={input.id === "gradYear" ? 1950 : undefined} max={input.id === "gradYear" ? new Date().getFullYear() + 10 : undefined} />
+                        {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
+                    </div>
+                )
+            })}
+        </div>
+        )
       case 3:
-            return (
-                <div className="space-y-5">
-                    <h2 className="text-2xl font-bold text-blue-800 mb-6">Social Links</h2>
-                    {socialFields.map((input) => (
+             case 3:
+        return (
+          <div className="space-y-5">
+            <h2 className="text-2xl font-bold text-blue-800 mb-6">Social Links</h2>
+                {socialFields.map((input) => {
+                    const isRequired = input.id === "linkedin"
+                    return (
                         <div key={input.id}>
-                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">{input.label}</label>
-                            <input type="text" id={input.id} name={input.id} value={formData.social[input.id]} onChange={handleInputChange} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900" placeholder={input.placeholder} required />
+                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
+                                {input.label} {isRequired && <span className="text-red-500">*</span>}
+                            </label>
+                            <input type="text" id={input.id} name={input.id} value={formData.social[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300" }`} placeholder={input.placeholder} />
+                            {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
                         </div>
-                    ))}
-                </div>
-            )
+                    )
+                })}
+          </div>
+        )
         case 4:
             return (
                 <div className="space-y-5">
                     <h2 className="text-2xl font-bold text-blue-800 mb-6">Development Profiles</h2>
-                    {developmentFields.map((input) => (
-                        <div key={input.id}>
-                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">{input.label}</label>
-                            <input type="text" id={input.id} name={input.id} value={formData.development[input.id]} onChange={handleInputChange} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900" placeholder={input.placeholder} required />
+                    {developmentFields.map((input) => {
+                        const isRequired = input.id === "github"
+                        return (
+                            <div key={input.id}>
+                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
+                                {input.label} {isRequired && <span className="text-red-500">*</span>}
+                            </label>
+                            <input type="text" id={input.id} name={input.id} value={formData.development[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300" }`} placeholder={input.placeholder} />
+                            {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
                         </div>
-                    ))}
+                        )
+                    })}
                 </div>
             )
         case 5:
             return (
                 <div className="space-y-5">
                     <h2 className="text-2xl font-bold text-blue-800 mb-6">Coding Profiles</h2>
-                    {codingProfilesFields.map((input) => (
-                        <div key={input.id}>
-                            <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">{input.label}</label>
-                            <input type="text" id={input.id} name={input.id} value={formData.codingProfiles[input.id]} onChange={handleInputChange} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900" placeholder={input.placeholder} required />
-                        </div>
-                    ))}
+                    {codingProfilesFields.map((input) => {
+                        const isRequired = input.id === "leetcode"
+                        return (
+                            <div key={input.id}>
+                                <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
+                                    {input.label} {isRequired && <span className="text-red-500">*</span>}
+                                </label>
+                                <input type="text" id={input.id} name={input.id} value={formData.codingProfiles[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300" }`} placeholder={input.placeholder} />
+                                {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
+                            </div>
+                        )
+                    })}
                 </div>
             )
         default:
