@@ -24,15 +24,17 @@ const ImageCarousel = () => {
     <div className="w-full max-w-2xl mx-auto relative">
         <div className="absolute -inset-2 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-3xl blur-xl opacity-50" />
         <div className="relative bg-white rounded-2xl p-2 shadow-2xl">
-            <Slider {...settings}>
-                {images.map((src, i) => (
-                    <div key={i} className="relative">
-                        <div className="rounded-xl overflow-hidden">
-                            <Image src={src} alt={`CodeOrbit Dashboard ${i + 1}`}  width={800} height={800} className="rounded-xl transform hover:scale-105 transition-transform duration-700" />
+            <div className="relative aspect-[4/3] w-full">
+                <Slider {...settings}>
+                    {images.map((src, i) => (
+                        <div key={i} className="relative">
+                            <div className="aspect-[4/3] w-full relative rounded-xl overflow-hidden">
+                              <Image src={src} alt={`CodeOrbit Dashboard ${i + 1}`} fill priority className="object-cover rounded-xl transform hover:scale-105 transition-transform duration-700" />
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </Slider>
+                    ))}
+                </Slider>
+            </div>
         </div>
     </div>
   )
