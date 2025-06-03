@@ -3,13 +3,16 @@ export interface CurvedNavProps {
     setActiveTab: (value: string) => void;
 }
 
-export interface AboutProps {
-    name: string
-    username: string
-    image: string
+export interface AboutProps extends SideBarProps {
     email: string
     education: EducationInterface
     info: InfoInterface
+}
+
+export interface SideBarProps {
+    name: string
+    username: string
+    image: string
 }
 
 export interface ProfileComponentProps {
