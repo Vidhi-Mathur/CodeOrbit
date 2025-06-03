@@ -17,28 +17,39 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    //Logged in but not onboarded yet
-    if(token && !token.isOnboarded && url.pathname !== onboardingRoute && url.pathname !== "/"){
-        url.pathname = onboardingRoute;
-        return NextResponse.redirect(url);
+    if(token){
+        //Logged in but not onboarded yet
+        if(!token.isOnboarded){
+            //Allow access to unprotected routes and onboarding
+            if(!protectedRoutes.includes(url.pathname)){
+                //If coming from /signup with redirect=true, go to /onboarding
+                if(url.pathname === "/" && url.searchParams.get("redirect") === "true"){
+                    url.pathname = onboardingRoute;
+                    url.searchParams.delete("redirect");
+                    return NextResponse.redirect(url);
+                }
+                return NextResponse.next();
+            }
+        }
+        else {
+            //Onboarded user trying to access /onboarding, redirect to /profile/:username
+            if(url.pathname === onboardingRoute){
+                url.pathname = `/profile/${username}`;
+                return NextResponse.redirect(url);
+            }
+            //Onboarded user accessing / with redirect=true, go to /profile/:username
+            if(url.pathname === "/" && url.searchParams.get("redirect") === "true"){
+                url.pathname = `/profile/${username}`;
+                url.searchParams.delete("redirect");
+                return NextResponse.redirect(url);
+            }
+        }
     }
-
-    //Onboarded but still trying to accessing /onboarding, redirect to /profile/:username 
-    if(token && token.isOnboarded && url.pathname === onboardingRoute){
-        url.pathname = `/profile/${username}`;
-        return NextResponse.redirect(url);
-    }
-
-    //Onboarded and trying to access home page with redirect query, redirect to /profile/:username
-    if(token && token.isOnboarded && url.pathname === "/" && url.searchParams.get("redirect") === "true"){
-        url.pathname = `/profile/${username}`;
-        url.searchParams.delete("redirect");
-        return NextResponse.redirect(url);
-    }
-
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/", "/onboarding"],
+    matcher: [
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    ],
 };
