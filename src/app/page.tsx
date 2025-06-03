@@ -20,9 +20,9 @@ export default function Home() {
         <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
             <div className="flex flex-col lg:flex-row items-center gap-16">
                 <div className="lg:w-1/2 space-y-8">
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#1A1B2E] leading-tight">
+                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#1A1B2E] leading-tight break-words">
                         Showcase Your{" "}
-                        <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                        <span className="inline-block bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                             Developer Journey
                         </span>
                     </h1>
