@@ -26,7 +26,7 @@ export const About = ({ name, username, image, email, education, info }: AboutPr
             <div className="flex flex-col md:flex-row items-start md:items-start gap-2 justify-between">
                 <div className="flex flex-col gap-2">
                     <div className="relative rounded-full w-24 h-24 overflow-hidden">
-                        <Image className="object-cover" src={image} alt="Profile" fill />
+                        <Image className="object-cover" src={image} alt="Profile" width={100} height={100} sizes="(max-width: 600px) 80px, 100px" priority />
                     </div>
                     <div className="mt-2">
                         <h2 className="text-xl font-semibold">{name}</h2>
