@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden">
         <div className="absolute inset-0 -z-10">
-            <Image src="/bg/bg3.png" alt="Background" fill className="object-cover opacity-95" priority />
+            <Image src="/bg/home_bg.png" alt="Background" fill className="object-cover opacity-95" priority />
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white/40 to-cyan-50/50" />
             <div className="absolute top-0 left-0 w-full h-full">
                 <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse" />
@@ -33,14 +33,14 @@ export default function Home() {
                         <span className="font-bold text-[#1A1B2E]">monitor</span> their projects and skills across platforms.
                     </p>
                     <div className="flex flex-wrap gap-6 pt-6">
-                    <Link href="/onboarding" className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                    Get Started Now
-                        <ArrowForwardIcon className="group-hover:translate-x-1 transition-transform" />
-                    </Link>
+                        <Link href="/onboarding" className="group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            Get Started Now
+                            <ArrowForwardIcon className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
                 </div>
-            </div>
-            <div className="lg:w-1/2 relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-3xl blur-2xl opacity-30" />
+                <div className="lg:w-1/2 relative">
+                    <div className="absolute -inset-4 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-3xl blur-2xl opacity-30" />
                     <ImageCarousel />
                 </div>
             </div>
@@ -55,7 +55,8 @@ export default function Home() {
                     Everything You Need in One Place
                 </h2>
                 <p className="text-xl text-gray-600 max-w-4xl mx-auto font-medium">
-                    Track your progress, showcase your skills, and connect with opportunities - all from a single, powerful dashboard designed for modern developers.
+                    Track your progress, showcase your skills, and connect with opportunities - all from a single, powerful
+                    dashboard designed for modern developers.
                 </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -73,19 +74,20 @@ export default function Home() {
                             CodeOrbit
                         </h3>
                         <p className="text-blue-200 text-lg font-medium max-w-md">
-                            Empowering developers worldwide to showcase their skills, track their progress, and accelerate their careers through intelligent portfolio management.
+                            Empowering developers worldwide to showcase their skills, track their progress, and accelerate their
+                            careers through intelligent portfolio management.
                         </p>
                     </div>
                 </div>
                 <div className="border-t border-blue-800 mt-6 pt-8 flex flex-col md:flex-row justify-between items-center">
                     <p className="text-blue-300 font-medium">
-                      &copy; {new Date().getFullYear()} CodeOrbit. All rights reserved.
+                        &copy; {new Date().getFullYear()} CodeOrbit. All rights reserved.
                     </p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         {["Privacy Policy", "Terms of Service"].map((text) => (
-                        <Link href="/" key={text} className="text-blue-300 hover:text-white transition-colors">
-                            {text}
-                        </Link>
+                            <Link href="/" key={text} className="text-blue-300 hover:text-white transition-colors">
+                                {text}
+                            </Link>
                         ))}
                     </div>
                 </div>
