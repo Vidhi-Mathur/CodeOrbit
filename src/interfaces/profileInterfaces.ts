@@ -1,3 +1,5 @@
+import { SideBarProps } from "./hompageInterface";
+
 export interface CurvedNavProps {
     activeTab: string;
     setActiveTab: (value: string) => void;
@@ -7,12 +9,6 @@ export interface AboutProps extends SideBarProps {
     email: string
     education: EducationInterface
     info: InfoInterface
-}
-
-export interface SideBarProps {
-    name: string
-    username: string
-    image: string
 }
 
 export interface ProfileComponentProps {

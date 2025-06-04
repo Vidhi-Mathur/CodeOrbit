@@ -4,3 +4,9 @@ export interface FeatureCardInterface {
   description: string
   gradient: string
 }
+
+export interface SideBarProps {
+    name: string
+    username: string
+    image: string
+}
