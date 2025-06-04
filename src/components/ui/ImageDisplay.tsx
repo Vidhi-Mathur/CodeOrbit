@@ -4,7 +4,7 @@ import Image from "next/image"
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
-import { desktopImages, mobileImages, ScreenSize, settings } from "@/constants/homepageConstants"
+import { desktopImages, mobileImages, ScreenSize, settings } from "@/constants/homepageConstant"
 
 const ImageCarousel = () => {
     const [screenSize, setScreenSize] = useState<ScreenSize>(ScreenSize.Desktop)
@@ -58,5 +58,6 @@ const ImageCarousel = () => {
         </div>
     )
 }
+
 
 export default ImageCarousel

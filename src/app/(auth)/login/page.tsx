@@ -1,6 +1,6 @@
 import React from "react"
 import { AuthForm } from "@/components/auth/AuthForm";
-import { loginCredentials } from "@/constants/authContant";
+import { loginCredentials } from "@/constants/authConstant";
 
 const Login = () => {
     return (

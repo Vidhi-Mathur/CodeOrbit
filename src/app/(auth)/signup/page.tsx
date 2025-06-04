@@ -1,5 +1,5 @@
 import { AuthForm } from "@/components/auth/AuthForm"
-import { signupCredentials } from "@/constants/authContant"
+import { signupCredentials } from "@/constants/authConstant"
 
 const Signup = () => {
     return (

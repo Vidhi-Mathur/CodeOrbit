@@ -3,7 +3,7 @@ import Link from "next/link"
 import ImageCarousel from "@/components/ui/ImageDisplay"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import SpeedIcon from "@mui/icons-material/Speed"
-import { features } from "@/constants/homepageConstants"
+import { features } from "@/constants/homepageConstant"
 import { FeatureCard } from "@/components/ui/FeatureCard"
 
 export default function Home() {
