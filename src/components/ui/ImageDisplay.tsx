@@ -1,43 +1,62 @@
 "use client"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
+import { desktopImages, mobileImages, ScreenSize, settings } from "@/constants/homepageConstants"
 
 const ImageCarousel = () => {
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        autoplay: true,
-        autoplaySpeed: 3000,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        fade: true,
-        cssEase: "cubic-bezier(0.4, 0, 0.2, 1)",
+    const [screenSize, setScreenSize] = useState<ScreenSize>(ScreenSize.Desktop)
+    useEffect(() => {
+        const checkScreenSize = () => {
+            const width = window.innerWidth
+            if(width < 768) setScreenSize(ScreenSize.Mobile) 
+            else if (width < 1024) setScreenSize(ScreenSize.Tablet)
+            else setScreenSize(ScreenSize.Desktop) 
+        }
+        checkScreenSize()
+        window.addEventListener("resize", checkScreenSize)
+        return () => window.removeEventListener("resize", checkScreenSize)
+    }, [])
+
+    const imagesToShow = screenSize === ScreenSize.Mobile? mobileImages: desktopImages
+
+    const getContainerClasses = () => {
+        switch (screenSize) {
+            case ScreenSize.Mobile:
+                return "max-w-xs" 
+            case ScreenSize.Tablet:
+                return "max-w-lg" 
+            case ScreenSize.Desktop:
+                return "max-w-2xl"
+            default:
+                return "max-w-2xl"
+        }
     }
 
-  const images = ["/bg/intro1_pc.png", "/bg/intro2_pc.png", "/bg/intro3_pc.png"]
+    const getAspectRatio = () => {
+        return screenSize === ScreenSize.Mobile ? "aspect-[2/3]" : "aspect-[3/2]"
+    }
 
-  return (
-    <div className="w-full max-w-2xl mx-auto relative">
-        <div className="absolute -inset-2 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-3xl blur-xl opacity-50" />
-        <div className="relative bg-white rounded-2xl p-2 shadow-2xl">
-            <div className="relative aspect-[4/3] w-full">
-                <Slider {...settings}>
-                    {images.map((src, i) => (
-                        <div key={i} className="relative">
-                            <div className="aspect-[4/3] w-full relative rounded-xl overflow-hidden">
-                              <Image src={src} alt={`CodeOrbit Dashboard ${i + 1}`} fill priority className="object-cover rounded-xl transform hover:scale-105 transition-transform duration-700" />
+    return (
+        <div className={`w-full mx-auto relative ${getContainerClasses()}`}>
+            <div className="absolute -inset-2 sm:-inset-3 lg:-inset-4 bg-gradient-to-r from-blue-200 to-cyan-200 rounded-2xl sm:rounded-3xl blur-xl opacity-50" />
+            <div className="relative bg-white rounded-xl sm:rounded-2xl p-1 sm:p-2 shadow-xl sm:shadow-2xl">
+                <div className={`relative w-full ${getAspectRatio()}`}>
+                    <Slider {...settings}>
+                        {imagesToShow.map((src, i) => (
+                            <div key={`${screenSize}-${i}`} className="relative">
+                                <div className={`w-full relative rounded-lg sm:rounded-xl overflow-hidden ${getAspectRatio()}`}>
+                                    <Image src={src} alt={`CodeOrbit Dashboard ${i + 1}`} fill priority={i === 0} sizes="(max-width: 768px) 320px, (max-width: 1024px) 512px, 672px" className="object-cover rounded-lg sm:rounded-xl transform hover:scale-105 transition-transform duration-700" />
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </Slider>
+                        ))}
+                    </Slider>
+                </div>
             </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default ImageCarousel
