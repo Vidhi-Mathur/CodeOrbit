@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { SideBar } from "./SideBar"
 
 export const NavigationBar = async() => {
-const session = await getServerSession(authOptions);
+const session = await getServerSession(authOptions)
   return (
     <div>
         <div className="fixed top-0 left-0 z-100 flex items-center justify-between backdrop-blur-md h-[72px] w-full px-2 pt-2 text-white">
@@ -16,7 +16,7 @@ const session = await getServerSession(authOptions);
             </div>
             <nav className="space-x-4">
                 {session?.user? (
-                    <SideBar name={session.user.name || "User"} image={session.user.image || "/common/user.png"} username={session.user.username || "username"} />
+                   <SideBar name={session.user.name ?? "User"} image={session.user.image ?? "/common/user.png"} username={session.user.username ?? "To_Be_Onboarded"} />
                 ): (
                     <Link href="/login" className="px-5 py-2 bg-[#03357a] text-white rounded-xl font-semibold text-xl">
                         Login

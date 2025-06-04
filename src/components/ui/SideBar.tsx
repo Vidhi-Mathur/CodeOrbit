@@ -5,13 +5,13 @@ import { useState, useRef, useEffect } from "react"
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import { signOut } from "next-auth/react"
-import { SideBarProps } from "@/interfaces/profileInterfaces";
+import { SideBarProps } from "@/interfaces/hompageInterface";
 
 export const SideBar = ({name, username, image}: SideBarProps) => {
-  const [isOpen, setOpen] = useState(false)
-  const sidebarRef = useRef<HTMLDivElement>(null)
-  const profileRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
+    const [isOpen, setOpen] = useState(false)
+    const sidebarRef = useRef<HTMLDivElement>(null)
+    const profileRef = useRef<HTMLDivElement>(null)
+    useEffect(() => {
         //Close sidebar when clicking outside
         const clickOutsideHandler = (event: MouseEvent) => {
             if(sidebarRef.current && profileRef.current && !sidebarRef.current.contains(event.target as Node) && !profileRef.current.contains(event.target as Node)){
@@ -72,13 +72,13 @@ export const SideBar = ({name, username, image}: SideBarProps) => {
                     <div className="flex items-center space-x-3">
                         <Image src={image} alt="profile" width={48} height={48} className="rounded-full" />
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{name || "User Name"}</p>
-                            <p className="text-sm text-gray-500 truncate">@{username || "username"}</p>
+                            <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+                            <p className="text-sm text-gray-500 truncate">@{username}</p>
                         </div>
                     </div>
                 </div>
                 <div className="py-2">
-                    <Link href={username ? `/profile/${username}` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
+                    <Link href={username != 'To_Be_Onboarded'? `/profile/${username}` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
                         <PersonIcon className="mr-2"/>
                         View your profile
                     </Link>
