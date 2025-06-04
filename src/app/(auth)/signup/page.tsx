@@ -1,9 +1,9 @@
 import { AuthForm } from "@/components/auth/AuthForm"
-import { signupCrendentials } from "@/constants/authContant"
+import { signupCredentials } from "@/constants/authContant"
 
 const Signup = () => {
     return (
-        <AuthForm heading="Signup" subheading="Already in orbit?" redirectLink="/login" redirectText="Log in here!" crendentials={signupCrendentials}/>
+        <AuthForm heading="Signup" subheading="Already in orbit?" redirectLink="/login" redirectText="Log in here!" credentials={signupCredentials}/>
     )
 }
 
