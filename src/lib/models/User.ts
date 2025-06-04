@@ -12,20 +12,28 @@ const UserSchema = new schema({
         required: true,
         unique: true,
     },
+    password: {
+        type: String,
+        required: function (this: any) {
+            return this.authProvider === "credentials"
+        },
+    },
     image: {
         type: String,
-        required: true,
+        required: false,
         default: "https://img.icons8.com/nolan/100/user-default.png"
     },
     authProvider: {
         type: String,
         required: true,
-        enum: ["google", "github", "twitter", "email"],
+        enum: ["google", "github", "twitter", "credentials"],
     },
     authProviderId: {
         type: String,
-        required: true,
-        unique: true,
+        required: function (this: any) {
+            return this.authProvider !== "credentials"
+        },
+        unique: false
     },
     username: {
         type: String,
@@ -79,8 +87,10 @@ const UserSchema = new schema({
         dsa: {
             leetcode: {
                 type: String,
-                required: function (this: any) {
-                    return this && this.isOnboarded
+                required: function (this: any): boolean {
+                    //Access the parent document to check isOnboarded
+                    const parentDoc = this.ownerDocument ? this.ownerDocument() : null;
+                    return parentDoc ? parentDoc.isOnboarded : false;
                 },
             },
             geeksforgeeks: {
@@ -97,7 +107,7 @@ const UserSchema = new schema({
             },
             hackerrank: {
                 type: String,
-                equired: false,
+                required: false,
             },
             interviewbit: {
                 type: String,
