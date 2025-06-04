@@ -5,6 +5,7 @@ import GitHubIcon from "@mui/icons-material/GitHub"
 import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import SecurityIcon from "@mui/icons-material/Security"
 import type { FeatureCardInterface } from "@/interfaces/hompageInterface"
+import type { Settings } from "react-slick"
 
 export const features: FeatureCardInterface[] = [
   {
@@ -47,3 +48,26 @@ export const features: FeatureCardInterface[] = [
     gradient: "from-cyan-50 to-cyan-100",
   },
 ]
+
+export const settings: Settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+    fade: true,
+    cssEase: "cubic-bezier(0.4, 0, 0.2, 1)",
+    dotsClass: "slick-dots !bottom-2",
+}
+
+export const desktopImages = ["/bg/intro1_pc.png", "/bg/intro2_pc.png", "/bg/intro3_pc.png"]
+export const mobileImages = ["/bg/intro1_mobile.png", "/bg/intro2_mobile.png", "/bg/intro3_mobile.png"]
+
+export enum ScreenSize {
+    Mobile = "mobile",
+    Tablet = "tablet",
+    Desktop = "desktop",
+}
