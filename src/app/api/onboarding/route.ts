@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "../auth/[...nextauth]/route"
 import connectToDB from "@/lib/connect"
 import User from "@/lib/models/User"
+import { authOptions } from "@/authOptions"
 
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
@@ -51,7 +51,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "User updated successfully", user: updatedUser }, { status: 200 })
     } 
     catch(err){
-        console.error("Failed to update user:", err)
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }
