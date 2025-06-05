@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import HomeIcon from "@mui/icons-material/Home"
 
-export default function NotFd() {
+export default function NotFound() {
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

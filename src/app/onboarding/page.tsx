@@ -98,7 +98,7 @@ export default function OnboardingPage() {
         if(currentStep > 1) setCurrentStep(currentStep - 1)
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault()
         if(!currentStepValidator())  return
         setIsLoading(true)
@@ -270,7 +270,7 @@ export default function OnboardingPage() {
                                 <div className="bg-gradient-to-r from-blue-600 to-blue-400 h-2.5 rounded-full transition-all duration-300 ease-in-out" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
                             </div>
                         </div>
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={submitHandler}>
                             {renderFormFields()}
                             <div className="mt-6 lg:mt-10 flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
                                 <button type="button" onClick={prevStep} className={`px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all text-sm sm:text-base ${currentStep === 1? "bg-blue-100 text-blue-400 cursor-not-allowed": "bg-white text-blue-700 border-2 border-blue-500 hover:bg-blue-50" }`} disabled={currentStep === 1}>
