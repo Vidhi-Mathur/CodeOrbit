@@ -76,8 +76,8 @@ const query =
         }`
     ;
 
-export async function GET(req: NextRequest, { params }: { params: { github_username: string } }) {
-    const { github_username } = params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ github_username: string }> }) {
+    const { github_username } = await params;
 
     if (!github_username){
         return new Response(JSON.stringify({ error: "Username is required" }), { status: 400 });
