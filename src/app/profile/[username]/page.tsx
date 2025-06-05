@@ -3,8 +3,8 @@ import connectToDB from "@/lib/connect"
 import User from "@/lib/models/User"
 import ProfileComponent from "@/components/ui/ProfileComponent"
 
-export default async function Profile({ params }: { params: { username: string } }) {
-    let { username } = params
+export default async function Profile({ params }: { params: Promise<{ username: string }> }) {
+    let { username } = await params
     await connectToDB()
     const user = await User.findOne({ username })
     if(!user) return notFound()

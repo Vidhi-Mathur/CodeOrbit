@@ -12,14 +12,7 @@ const extractedRepos = (repo: any): GitHubRepoInterface => ({
     topics: repo.repositoryTopics?.nodes?.map((node: any) => node.topic.name) || [],
 })
 
-export async function GET(req: NextRequest, { params }: { params: { github_username: string } }) {
-    const { github_username } = params;
-
-    if (!github_username){
-        return new Response(JSON.stringify({ error: "Username is required" }), { status: 400 });
-    }
-
-    const query = 
+const query = 
         `query getGitHubProfile($github_username: String!) {
             user(login: $github_username) {
                 name
@@ -83,6 +76,13 @@ export async function GET(req: NextRequest, { params }: { params: { github_usern
         }`
     ;
 
+export async function GET(req: NextRequest, { params }: { params: { github_username: string } }) {
+    const { github_username } = params;
+
+    if (!github_username){
+        return new Response(JSON.stringify({ error: "Username is required" }), { status: 400 });
+    }
+
     try {
         const response = await axios.post('https://api.github.com/graphql', { query, variables: { github_username } }, {
             headers: {
@@ -124,7 +124,6 @@ export async function GET(req: NextRequest, { params }: { params: { github_usern
 
     } 
     catch (err: any){
-        console.error("GitHub GraphQL Error:", JSON.stringify(err.response?.data || err.message, null, 2))
         return new Response(JSON.stringify({ error: "Failed to fetch GitHub data" }), { status: 500 })
     }
 }

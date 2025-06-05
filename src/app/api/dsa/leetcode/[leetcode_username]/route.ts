@@ -59,8 +59,8 @@ const profileQuery = `
         }
     `
 
-export async function GET(req: NextRequest, { params }: { params: { leetcode_username: string } }) {
-    const { leetcode_username } = params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ leetcode_username: string }> }) {
+    const { leetcode_username } = await params;
 
     if(!leetcode_username){
         return new Response(JSON.stringify({ error: "Username is required" }), { status: 400 });
@@ -136,8 +136,7 @@ export async function GET(req: NextRequest, { params }: { params: { leetcode_use
         
         return new Response(JSON.stringify({ profileResponse, contestResponse, submissionCalendarResponse: calendarMap }), { status: 200 })
     } 
-    catch (err: any){
-        console.error("Leetcode GraphQL Error:", JSON.stringify(err.response?.data || err.message, null, 2))
+    catch(err: any){
         return new Response(JSON.stringify({ error: "Failed to fetch Leetcode data" }), { status: 500 })
     }
 }
