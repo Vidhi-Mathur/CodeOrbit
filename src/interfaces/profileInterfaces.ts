@@ -1,8 +1,9 @@
+import { ProfileTabs } from "@/constants/profileConstant";
 import { SideBarProps } from "./hompageInterface";
 
 export interface CurvedNavProps {
-    activeTab: string;
-    setActiveTab: (value: string) => void;
+    activeTab: ProfileTabs
+    setActiveTab: (value: ProfileTabs) => void;
 }
 
 export interface AboutProps extends SideBarProps {
