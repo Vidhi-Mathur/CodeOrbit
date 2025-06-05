@@ -1,4 +1,5 @@
-import { months } from "@/constants/profileConstant"
+import { InfoLink, months } from "@/constants/profileConstant"
+import { AboutProps } from "@/interfaces/profileInterfaces"
 
 export const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -128,4 +129,19 @@ export const getRatingColor = (rating: number) => {
     if(rating >= 1600) return "text-purple-600"
     if(rating >= 1400) return "text-blue-600"
     return "text-green-600"
+}
+
+export const getRedirection = (key: InfoLink, info: AboutProps["info"], email: string): string => {
+    switch (key) {
+        case "email":
+            return `mailto:${email}`;
+        case "linkedin":
+            return info.linkedin ? `https://www.linkedin.com/in/${info.linkedin}` : "/";
+        case "twitter":
+            return info.twitter ? `https://x.com/${info.twitter}` : "/";
+        case "website":
+            return info.website || "/";
+        default:
+            return "/";
+    }
 }
