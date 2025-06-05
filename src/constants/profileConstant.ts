@@ -11,11 +11,20 @@ export type CpLink = typeof cpLinks[number];
 export const devLinks: string[] = ["github"] as const 
 export type DevLink = typeof devLinks[number]
 
-export const profileConstants: Profile[] = [{
-    label: "Problem Solving",
-    image: "problemsolving"
-    }, {
-    label: "Development",
-    image: "development"
+export const PROFILE_TABS = {
+    PROBLEM_SOLVING: "problemsolving",
+    DEVELOPMENT: "development"
+} as const;
+
+export type ProfileTabs = typeof PROFILE_TABS[keyof typeof PROFILE_TABS];
+
+export const profileConstants: readonly Profile[] = [
+    {
+        label: "Problem Solving",
+        image: PROFILE_TABS.PROBLEM_SOLVING
+    },
+    {
+        label: "Development", 
+        image: PROFILE_TABS.DEVELOPMENT
     }
-]
+] as const;
