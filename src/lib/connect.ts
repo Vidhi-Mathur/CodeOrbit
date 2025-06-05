@@ -9,10 +9,9 @@ const connectToDB = async() => {
         //1 = already connected, or 2 = connecting
         if(mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) return
         await mongoose.connect(mongoURI)
-        console.log("Connected to MongoDB")
     }
     catch(err){
-        console.log(err)
+        throw new Error("Failed to connect, try again later");
     }
 }
 
