@@ -8,7 +8,7 @@ import type { GitHubProfileProps } from "@/interfaces/dev/github/githubInterface
 
 export const GitHubProfile = ({ profile }: GitHubProfileProps) => {
     return (
-        <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-[95%] ml-auto relative">
+        <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative">
             <div className="bg-[#1A1B2E] p-3 sm:p-4 md:p-3 lg:p-5 text-white">
                 <div className="flex items-center gap-3 sm:gap-3 md:gap-2 lg:gap-4">
                     <Link href={`https://github.com/${profile.login}`} target="_blank" rel="noopener noreferrer" className="text-white hover:text-cyan-200 transition-colors">
