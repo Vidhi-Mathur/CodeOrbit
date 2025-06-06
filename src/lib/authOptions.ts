@@ -23,6 +23,9 @@ export const authOptions: AuthOptions = {
                     throw new Error("Missing credentials");
                 }
                 const { name, email, password } = credentials;
+                if(!email || !password){
+                    throw new Error("Please provide your email and password.");
+                }
                 const existingUser = await User.findOne({ email });
                 if(existingUser){
                     if(existingUser.authProvider !== "credentials"){
@@ -34,18 +37,20 @@ export const authOptions: AuthOptions = {
                     }
                     return existingUser;
                 }
-                if(!name || !email || !password){
-                    throw new Error("Please provide name, email and password");
+                else {
+                    if(!name){
+                        throw new Error("Name is required to create a new account.");
+                    }
+                    const hashedPassword = await bcrypt.hash(password, 10);
+                    const newUser = await User.create({
+                        name,
+                        email,
+                        password: hashedPassword,
+                        authProvider: "credentials",
+                        isOnboarded: false,
+                    })
+                return newUser;   
                 }
-                const hashedPassword = await bcrypt.hash(password, 10);
-                const newUser = await User.create({
-                    name,
-                    email,
-                    password: hashedPassword,
-                    authProvider: "credentials",
-                    isOnboarded: false,
-                })
-                return newUser;
             },
         }),
         GoogleProvider({
