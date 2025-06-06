@@ -57,9 +57,8 @@ export const authOptions: AuthOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         }),
         TwitterProvider({  
-            clientId: process.env.TWITTER_CLIENT_ID!,
-            clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-            version: "2.0"
+            clientId: process.env.TWITTER_API_KEY!,
+            clientSecret: process.env.TWITTER_API_SECRET!
         })
     ],
     pages: {

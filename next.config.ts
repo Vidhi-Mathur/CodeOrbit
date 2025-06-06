@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+     experimental: {
+    allowedDevOrigins: ["http://192.168.1.4:3000"],
+  },
   images: {
     remotePatterns: [
       {
@@ -26,6 +29,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };
