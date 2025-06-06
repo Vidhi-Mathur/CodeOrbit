@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { getServerSession } from "next-auth"
 import { SideBar } from "./SideBar"
-import { authOptions } from "@/authOptions";
+import { authOptions } from "@/lib/authOptions";
 
 export const NavigationBar = async() => {
 const session = await getServerSession(authOptions)

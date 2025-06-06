@@ -16,7 +16,6 @@ const ImageCarousel = () => {
             else if (width < 1024) setScreenSize(ScreenSize.Tablet)
             else setScreenSize(ScreenSize.Desktop)
         }
-
         checkScreenSize()
         window.addEventListener("resize", checkScreenSize)
         return () => window.removeEventListener("resize", checkScreenSize)
