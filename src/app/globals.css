@@ -39,3 +39,33 @@ body {
     display: none; /* Chrome, Safari and Opera */
   }
 }
+
+.slick-slider {
+  height: 100% !important;
+}
+
+.slick-list {
+  height: 100% !important;
+}
+
+.slick-track {
+  height: 100% !important;
+}
+
+.slick-slide > div {
+  height: 100% !important;
+}
+
+.slick-dots {
+  position: absolute !important;
+  bottom: 8px !important;
+  margin: 0 !important;
+}
+
+.slick-slider:not(.slick-initialized) {
+  visibility: hidden;
+}
+
+.slick-slider.slick-initialized {
+  visibility: visible;
+}
