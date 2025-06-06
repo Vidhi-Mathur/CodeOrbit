@@ -66,7 +66,7 @@ export const AuthForm: React.FC<AuthProps> = ({ heading, subheading, redirectLin
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white/5 to-cyan-50/50" />
             </div>
             <div className="w-full mx-auto flex justify-center">
-                <div className="flex flex-col lg:flex-row shadow-lg rounded-lg text-black bg-[#c1d5e9] mt-16 md:mt-12 sm:mt-8 w-full h-[600px] sm:h-[650px] lg:h-[550px] max-w-sm sm:max-w-md md:max-w-3xl lg:max-w-3xl xl:max-w-4xl">
+                <div className="flex flex-col lg:flex-row shadow-lg rounded-lg text-black bg-[#c1d5e9] overflow-hidden mt-16 md:mt-12 sm:mt-8 w-full min-h-[600px] sm:min-h-[650px] lg:min-h-[550px] max-w-sm sm:max-w-md md:max-w-3xl lg:max-w-3xl xl:max-w-4xl">
                     {/* On top, small/ medium screen */}
                     <div className="block lg:hidden relative w-full aspect-[3/2] flex-shrink-0">
                         <Image src="/bg/auth_mobile.png" fill alt="Background" className="object-cover" />
