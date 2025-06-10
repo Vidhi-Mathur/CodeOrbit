@@ -13,7 +13,7 @@ import DevStats from "@/components/dev/DevStats"
 import { GitHubProfile } from "@/components/dev/github/GitHubProfile"
 import { GitHubRepo } from "@/components/dev/github/GitHubRepo"
 import { CurvedNav } from "@/components/ui/CuvedNav"
-import { ShimmerContest, ShimmerProfile, ShimmerRepo, ShimmerSubmissionCalendar } from "@/components/ui/ShimmerUI"
+import { ShimmerContest, ShimmerProfile, ShimmerRepo, ShimmerSubmissionCalendar  } from "@/components/ui/ShimmerUI"
 
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
     const [activeTab, setActiveTab] = useState<ProfileTabs>(PROFILE_TABS.PROBLEM_SOLVING)
