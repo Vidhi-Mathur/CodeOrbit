@@ -58,7 +58,7 @@
     - `api` 
     - `onboarding`
     - `profile` 
-    - `page.tsx`, `found.tsx`, etc.
+    - `page.tsx`, `not-found.tsx`, `error.tsx` etc.
   - `components`
     - `ui`
     - `auth`
