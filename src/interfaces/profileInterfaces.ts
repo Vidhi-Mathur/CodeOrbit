@@ -6,6 +6,11 @@ export interface CurvedNavProps {
     setActiveTab: (value: ProfileTabs) => void;
 }
 
+export interface StatsProps<T> {
+    onClick: (platform: T) => void
+    activePlatform: T
+}
+
 export interface AboutProps extends SideBarProps {
     email: string
     education: EducationInterface
