@@ -1,4 +1,3 @@
-"use client"
 import { dsaLinks, DsaLink } from "@/constants/profileConstant"
 import { StatsProps } from "@/interfaces/profileInterfaces"
 import Image from "next/image"

@@ -1,4 +1,4 @@
-import { ProfileTabs } from "@/constants/profileConstant";
+import { DevLink, DsaLink, ProfileTabs } from "@/constants/profileConstant";
 import { SideBarProps } from "./hompageInterface";
 
 export interface CurvedNavProps {
@@ -34,6 +34,19 @@ export interface ProfileComponentProps {
         }
     }
 };
+
+export interface ProfileHeaderProps {
+    user: ProfileComponentProps["user"]
+    activeTab: ProfileTabs
+    onTabChange: (tab: ProfileTabs) => void
+}
+
+export interface SectionProps {
+    user: ProfileComponentProps["user"]
+    activePlatform: DsaLink | DevLink
+    onPlatformChange: (platform: DsaLink | DevLink) => void
+    renderSidebarOnly?: boolean
+}
 
 export interface EducationInterface {
     degree: string
