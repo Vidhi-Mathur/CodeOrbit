@@ -80,7 +80,7 @@ export const ShimmerRepo = () => {
 
 export const ShimmerSubmissionCalendar = () => {
     return (
-    <div className="bg-white rounded-xl shadow-sm border relative m-2">
+    <div className="bg-white rounded-xl shadow-sm border relative m-4">
         <div className="mb-4">
             <div className="bg-[#1A1B2E] px-5 py-4 rounded-md mb-4">
                 <ShimmerEffect className="h-6 w-40 bg-gray-600 rounded" />
@@ -123,7 +123,7 @@ export const ShimmerSubmissionCalendar = () => {
 
 export const ShimmerContest = () => {
     return (
-        <div className="bg-white rounded-xl shadow-sm border m-2">
+        <div className="bg-white rounded-xl shadow-sm border m-4">
             <div className="mb-4">
             <div className="bg-[#1A1B2E] px-5 py-4 rounded-md mb-4">
                 <ShimmerEffect className="h-6 w-40 bg-gray-600 rounded" />
