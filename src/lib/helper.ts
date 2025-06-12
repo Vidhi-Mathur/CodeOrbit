@@ -56,18 +56,22 @@ export const groupDatesByMonth = (dates: Date[]) => {
 
     //Group dates by month-year
     const datesByMonth: { [key: string]: Date[] } = {}
-
     //Iterate through all dates and group them by month
     dates.forEach((date) => {
-        const monthKey = `${date.getFullYear()}-${date.getMonth()}`
+        const monthKey = `${date.getFullYear()}-${date.getMonth().toString().padStart(2, "0")}`
         if(!datesByMonth[monthKey]){
             datesByMonth[monthKey] = []
         }
         datesByMonth[monthKey].push(date)
     })
 
-    //Convert each month's dates into week structure
-    Object.keys(datesByMonth).sort().forEach((monthKey) => {
+    //Convert each month's dates into week structure (sort chronologically)
+    Object.keys(datesByMonth).sort((a, b) => {
+        const [yearA, monthA] = a.split("-").map(Number)
+        const [yearB, monthB] = b.split("-").map(Number)
+        if(yearA !== yearB) return yearA - yearB
+        return monthA - monthB
+    }).forEach((monthKey) => {
         const [year, month] = monthKey.split("-").map(Number)
         const monthDates = datesByMonth[monthKey]
 
@@ -80,11 +84,11 @@ export const groupDatesByMonth = (dates: Date[]) => {
         //Find the first date and determine what day of week it starts on
         const firstDate = monthDates[0]
         //[0, 6] = [Sunday, Saturday]
-        const startDayOfWeek = firstDate.getDay() 
+        const startDayOfWeek = firstDate.getDay()
 
         //Fill in empty slots at the beginning of the first week if needed
         for(let i = 0; i < startDayOfWeek; i++){
-            currentWeek.push(null)
+          currentWeek.push(null)
         }
 
         //Add all dates for this month
@@ -106,6 +110,7 @@ export const groupDatesByMonth = (dates: Date[]) => {
         if(currentWeek.length > 0){
             weeks.push(currentWeek)
         }
+
         //Add this month group
         monthGroups.push({ month, year, label: months[month], weeks })
     })
