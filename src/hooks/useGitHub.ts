@@ -6,6 +6,7 @@ import { useState } from "react"
 export const useGitHub = (githubUsername: string) => {
     const [githubProfile, setGithubProfile] = useState<GitHubProfileInterface | null>(null)
     const [repos, setRepos] = useState<GitHubRepoInterface[]>([])
+    const [calendar, setCalendar] = useState()
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const fetchGitHubData = async() => {
@@ -13,7 +14,9 @@ export const useGitHub = (githubUsername: string) => {
         setError(null)
         try {
             const response =  await axios.get(`/api/dev/github/${githubUsername}`)
-            const { profileResponse, reposResponse } = response.data
+            const { profileResponse, reposResponse, calendarResponse } = response.data
+            console.log(calendarResponse)
+            setCalendar(calendarResponse)
             setGithubProfile(profileResponse)
             setRepos(reposResponse)
         } 
@@ -26,5 +29,5 @@ export const useGitHub = (githubUsername: string) => {
             setLoading(false)
         }
     }
-    return { githubProfile, repos, loading, error, fetchGitHubData  }
+    return { githubProfile, repos, calendar, loading, error, fetchGitHubData  }
 }
