@@ -26,3 +26,22 @@ export interface GitHubProfileProps {
 export interface GitHubActivityProps {
     username: string
 }
+
+export interface GitHubCalendarProps {
+    contributions: {
+        activeYears: number[]
+        contributionCalendarResponse: {
+            [year: number]: {
+                totalContributions: number
+                weeks: {
+                    contributionDays: {
+                        color: string
+                        contributionCount: number
+                        date: string
+                        weekday: number
+                    }[]
+                }[]
+            }
+        }
+    }
+}
