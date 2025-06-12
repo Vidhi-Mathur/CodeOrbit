@@ -21,8 +21,8 @@ const tooltipContent = (date: Date, count: number) => {
     )
 }
 
-const SubmissionCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
-    const allYears = Object.keys(calendarMap) .map(Number) .sort((a, b) => b - a)
+export const LeetCodeCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
+    const allYears = Object.keys(calendarMap).map(Number).sort((a, b) => b - a)
 
     //To select year
     const [selectedYear, setSelectedYear] = useState<number>(allYears[0])
@@ -154,4 +154,3 @@ const SubmissionCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
     )
 }
 
-export default SubmissionCalendar

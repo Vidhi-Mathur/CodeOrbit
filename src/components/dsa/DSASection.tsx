@@ -6,8 +6,8 @@ import { useLeetCode } from "@/hooks/useLeetCode"
 import DSAStats from "@/components/dsa/DSAStats"
 import { LeetCodeProfile } from "@/components/dsa/leetcode/LeetCodeProfile"
 import { LeetCodeContest } from "../dsa/leetcode/LeetCodeContest"
-import SubmissionCalendar from "../dsa/leetcode/SubmissionCalendar"
-import { ShimmerProfile, ShimmerSubmissionCalendar, ShimmerContest } from "@/components/ui/ShimmerUI"
+import { LeetCodeCalendar } from "./leetcode/LeetCodeCalendar"
+import { ShimmerProfile, ShimmerCalendar, ShimmerContest } from "@/components/ui/ShimmerUI"
 
 export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
     const { leetcodeProfile, contest, submissionCalendar, loading: leetcodeLoading, error: leetcodeError, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
@@ -38,7 +38,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             <>
             {leetcodeLoading && (
                 <>
-                <ShimmerSubmissionCalendar />
+                <ShimmerCalendar />
                 <ShimmerContest />
                 </>
             )}
@@ -51,7 +51,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                 <>
                 {submissionCalendar && (
                     <div className="p-2 sm:p-3">
-                        <SubmissionCalendar
+                        <LeetCodeCalendar
                             calendarMap={
                                 typeof submissionCalendar === "object" && "submissionCalendar" in submissionCalendar
                                   ? { [new Date().getFullYear()]: submissionCalendar }
