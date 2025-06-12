@@ -7,10 +7,10 @@ import { formatDate } from "@/lib/helper"
 
 export const GitHubRepo = ({ repos }: { repos: GitHubRepoInterface[] }) => {
     return (
-        <div className="space-y-3 sm:space-y-3 md:space-y-3 lg:space-y-4 px-2 sm:px-2 md:px-0 lg:px-3 mb-3 sm:mb-3 md:mb-3 lg:mb-4">
+        <div className="space-y-3 sm:space-y-3 md:space-y-3 lg:space-y-4">
             {repos.map((repo) => {
                 return (
-                    <div className="bg-white border border-cyan-300/70 rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:border-black" key={repo.name}>
+                    <div className="bg-white rounded-xl sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative border border-cyan-300/70 hover:border-black" key={repo.name}>
                         <div className="bg-[#1A1B2E] px-3 sm:px-4 md:px-4 lg:px-5 py-2.5 sm:py-3 md:py-3 lg:py-4">
                             <h3 className="text-sm sm:text-base md:text-base lg:text-lg font-bold text-white leading-tight tracking-wider">
                                 {repo.name}
@@ -35,14 +35,14 @@ export const GitHubRepo = ({ repos }: { repos: GitHubRepoInterface[] }) => {
                             {repo.topics && repo.topics.length > 0 && (
                                 <div className="mb-3 sm:mb-3 md:mb-3 lg:mb-4">
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-2 lg:gap-2">
-                                        {repo.topics.slice(0, 3).map((topic) => (
+                                        {repo.topics.slice(0, 10).map((topic) => (
                                             <span key={topic} className="inline-block bg-cyan-100 text-black text-xs px-2 sm:px-2.5 md:px-2.5 lg:px-3 py-1 sm:py-1 md:py-1 lg:py-1.5 rounded-md sm:rounded-md md:rounded-md lg:rounded-lg font-bold border border-[#1A1B2E] tracking-wide">
                                                 {topic}
                                             </span>
                                         ))}
-                                        {repo.topics.length > 3 && (
+                                        {repo.topics.length > 10 && (
                                             <span className="inline-block bg-gray-50 text-gray-600 text-xs px-2 sm:px-2.5 md:px-2.5 lg:px-3 py-1 sm:py-1 md:py-1 lg:py-1.5 rounded-md sm:rounded-md md:rounded-md lg:rounded-lg font-bold border border-gray-200 tracking-wide">
-                                                +{repo.topics.length - 3}
+                                                +{repo.topics.length - 10}
                                             </span>
                                         )}
                                     </div>
