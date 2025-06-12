@@ -11,6 +11,13 @@ export interface StatsProps<T> {
     activePlatform: T
 }
 
+export interface SectionProps {
+    user: ProfileComponentProps["user"]
+    activePlatform: DsaLink | DevLink
+    onPlatformChange: (platform: DsaLink | DevLink) => void
+    renderSidebarOnly?: boolean
+}
+
 export interface AboutProps extends SideBarProps {
     email: string
     education: EducationInterface
@@ -39,13 +46,6 @@ export interface ProfileHeaderProps {
     user: ProfileComponentProps["user"]
     activeTab: ProfileTabs
     onTabChange: (tab: ProfileTabs) => void
-}
-
-export interface SectionProps {
-    user: ProfileComponentProps["user"]
-    activePlatform: DsaLink | DevLink
-    onPlatformChange: (platform: DsaLink | DevLink) => void
-    renderSidebarOnly?: boolean
 }
 
 export interface EducationInterface {
