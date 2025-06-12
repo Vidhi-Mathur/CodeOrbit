@@ -47,9 +47,9 @@ export const ShimmerProfile = () => {
 
 export const ShimmerRepo = () => {
     return (
-        <div className="space-y-4 px-3 mb-4">
+        <div className="space-y-3 sm:space-y-3 md:space-y-3 lg:space-y-4">
             {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white border border-cyan-300/70 rounded-xl shadow-sm overflow-hidden">
+                <div key={i} className="bg-white rounded-xl overflow-hidden sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md n w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative">
                     <div className="bg-[#1A1B2E] px-5 py-4">
                         <ShimmerEffect className="h-5 w-40 bg-gray-700 rounded-md" />
                     </div>
@@ -78,7 +78,7 @@ export const ShimmerRepo = () => {
     )
 }
 
-export const ShimmerSubmissionCalendar = () => {
+export const ShimmerCalendar = () => {
     return (
     <div className="bg-white rounded-xl shadow-sm border relative m-4">
         <div className="mb-4">
