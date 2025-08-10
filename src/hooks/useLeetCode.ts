@@ -1,5 +1,5 @@
 "use client"
-import type { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
+import type { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
 import axios from "axios"
 import { useState } from "react"
 
@@ -8,25 +8,27 @@ export const useLeetCode = (leetcodeUsername: string) => {
     const [contest, setContest] = useState<LeetcodeContestInterface>();
     const [submissionCalendar, setSubmissionCalendar] = useState<LeetcodeCalendarInterface | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null)
+    const [errors, setErrors] = useState<LeetCodeErrorInterface>({});
     const fetchLeetCodeData = async() => {
         setLoading(true)
-        setError(null)
         try {
             const response =  await axios.get(`/api/dsa/leetcode/${leetcodeUsername}`)
-            const { profileResponse, contestResponse, submissionCalendarResponse } = response.data
+            const { profileResponse, contestResponse, submissionCalendarResponse, errors } = response.data
             setLeetcodeProfile(profileResponse)
             setContest(contestResponse)
             setSubmissionCalendar(submissionCalendarResponse)
+            setErrors(errors || {});
         } 
         catch(err: any){
-            console.error("API call failed", err)
-            let message = err.response?.data?.error || "Failed to load LeetCode profile"
-            setError(message)
+            setErrors({
+                profile: "Failed to load profile",
+                contest: "Failed to load contest",
+                calendar: "Failed to load calendar"
+            }); 
         } 
         finally{
             setLoading(false)
         }
     }
-    return { leetcodeProfile, contest, submissionCalendar, loading, error, fetchLeetCodeData }
+    return { leetcodeProfile, contest, submissionCalendar, loading, errors, fetchLeetCodeData }
 }

@@ -79,11 +79,11 @@ export const LeetCodeProfile = ({ profile }: LeetCodeProfileProps) => {
                 </div>
                 {profile.skillTags.length > 0 && (
                     <div className="flex items-center gap-2 sm:gap-2 md:gap-2 lg:gap-2 col-span-1 sm:col-span-1 md:col-span-1 lg:col-span-2">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-6 md:h-6 lg:w-8 lg:h-8 bg-blue-200 rounded-full flex items-center justify-center">
-                            <StarBorderOutlinedIcon style={{ fontSize: "16px" }} className="text-[#1A1B2E]" />
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-8 md:h-8 lg:w-10 lg:h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                            <StarBorderOutlinedIcon className="text-[#1A1B2E]" style={{ fontSize: "20px" }} />
                         </div>
                         <div>
-                            <div className="text-xs sm:text-sm md:text-xs lg:text-sm text-gray-500">
+                            <div className="text-xs sm:text-sm md:text-xs lg:text-sm font-bold text-gray-700 mb-1 sm:mb-1.5 md:mb-1 lg:mb-2 uppercase tracking-wider">
                                 Skills
                             </div>
                             <span className="text-gray-500 text-xs sm:text-sm md:text-xs lg:text-base">

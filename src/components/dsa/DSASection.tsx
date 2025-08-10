@@ -10,7 +10,7 @@ import { LeetCodeCalendar } from "./leetcode/LeetCodeCalendar"
 import { ShimmerProfile, ShimmerCalendar, ShimmerContest } from "@/components/ui/ShimmerUI"
 
 export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
-    const { leetcodeProfile, contest, submissionCalendar, loading: leetcodeLoading, error: leetcodeError, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
+    const { leetcodeProfile, contest, submissionCalendar, loading: leetcodeLoading, errors: leetcodeErrors, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
 
     const platformClickHandler = (platform: DsaLink | DevLink) => {
         onPlatformChange(platform)
@@ -42,14 +42,14 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                 <ShimmerContest />
                 </>
             )}
-            {leetcodeError && (
-                <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
-                    {leetcodeError}
-                </div>
-            )}
-            {!leetcodeLoading && !leetcodeError && (
+            {!leetcodeLoading && (
                 <>
-                {submissionCalendar && (
+                {leetcodeErrors.calendar? (
+                    <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
+                        {leetcodeErrors.calendar}
+                    </div>
+                    ): (
+                    submissionCalendar && (
                     <div className="p-2 sm:p-3">
                         <LeetCodeCalendar
                             calendarMap={
@@ -58,11 +58,17 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                                   : submissionCalendar}
                             />
                     </div>
-                )}
-                {contest && (
-                    <div className="p-2 sm:p-3">
-                        <LeetCodeContest contest={contest} />
+                ))}
+                {leetcodeErrors.contest ? (
+                    <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
+                        {leetcodeErrors.contest}
                     </div>
+                    ): (
+                    contest && (
+                        <div className="p-2 sm:p-3">
+                            <LeetCodeContest contest={contest} />
+                        </div>
+                    )
                 )}
                 </>
             )}
@@ -77,12 +83,13 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             return (
                 <>
                 {leetcodeLoading && <ShimmerProfile />}
-                {leetcodeError && (
+                {leetcodeErrors.profile? (
                     <div className="sm:-mt-15 lg:-mt-20 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
-                        {leetcodeError}
+                        {leetcodeErrors.profile}
                     </div>
+                ): (
+                    leetcodeProfile && <LeetCodeProfile profile={leetcodeProfile} />
                 )}
-                {!leetcodeLoading && !leetcodeError && leetcodeProfile && <LeetCodeProfile profile={leetcodeProfile} />}
                 </>
             )
         }

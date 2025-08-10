@@ -37,6 +37,12 @@ export interface ContestStatsProps {
     contest: LeetcodeContestInterface
 }
 
+export interface LeetCodeErrorInterface {
+    profile?: string
+    contest?: string
+    calendar?: string
+}
+
 interface LeetCodeBadge {
     id: string
     name: string

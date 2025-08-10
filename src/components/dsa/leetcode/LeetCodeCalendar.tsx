@@ -137,9 +137,10 @@ export const LeetCodeCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
                                             return <div key={`empty-${dayIndex}`} className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3" />
                                         }
                                         const count = getSubmissionCount(date)
+                                        const intensity = getIntensity(count);
                                         return (
                                             <ToolTip key={date.toISOString()} placement="top" title={tooltipContent(date, count)}>
-                                                <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3 rounded-sm border cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-2 hover:ring-black hover:ring-opacity-50 ${getIntensity(count)}`} />
+                                                <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3 rounded-sm border cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-2 hover:ring-black hover:ring-opacity-50 ${intensity}`} />
                                             </ToolTip>
                                         )
                                     })}
