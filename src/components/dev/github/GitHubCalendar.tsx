@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react"
 import CodeIcon from "@mui/icons-material/Code"
 import { ToolTip } from "@/components/ui/ToolTip"
-import { formatDate, groupDatesByMonth } from "@/lib/helper"
+import { formatDate, getIntensity, groupDatesByMonth } from "@/lib/helper"
 import { GitHubCalendarProps } from "@/interfaces/dev/github/githubInterface"
 
 const tooltipContent = (date: Date, count: number) => {
@@ -44,7 +44,7 @@ export const GitHubCalendar = ({ contributions }: GitHubCalendarProps) => {
         return map
     }, [flattenedContributions])
 
-    const allDates = useMemo(() => {
+    const monthGroups = useMemo(() => {
         const dates = flattenedContributions.map((c) => new Date(c.date))
         return groupDatesByMonth(dates)
     }, [flattenedContributions])
@@ -64,7 +64,7 @@ export const GitHubCalendar = ({ contributions }: GitHubCalendarProps) => {
     }
 
     return (
-    <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-sm border relative m-1 sm:m-1.5 md:m-0 lg:m-2">
+        <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-sm border relative m-1 sm:m-1.5 md:m-0 lg:m-2">
         <div className="mb-3 sm:mb-3 md:mb-3 lg:mb-4">
             <div className="bg-[#1A1B2E] px-3 sm:px-4 md:px-4 lg:px-5 py-2.5 sm:py-3 md:py-3 lg:py-4 rounded-md mb-3 sm:mb-3 md:mb-3 lg:mb-4">
                 <h3 className="text-sm sm:text-base md:text-base lg:text-lg font-bold text-white leading-tight tracking-wide">
@@ -80,7 +80,7 @@ export const GitHubCalendar = ({ contributions }: GitHubCalendarProps) => {
                         {selectedYearData?.totalContributions || 0}
                     </div>
                     <div className="text-xs sm:text-xs md:text-xs lg:text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        Total contributions
+                        Total submissions
                     </div>
                 </div>
             </div>
@@ -100,39 +100,70 @@ export const GitHubCalendar = ({ contributions }: GitHubCalendarProps) => {
             </div>
         )}
         <div className="relative px-2 sm:px-3 md:px-3 lg:px-4 pb-2 sm:pb-3 md:pb-3 lg:pb-4">
-            {selectedYearData? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-2 lg:gap-6">
-                    {allDates.map((monthGroup) => (
-                        <div key={`${monthGroup.year}-${monthGroup.month}`}>
-                            <div className="text-xs sm:text-xs md:text-xs lg:text-xs font-semibold text-gray-600 text-center mb-1 sm:mb-1.5 md:mb-1 lg:mb-2 uppercase tracking-wider" style={{ minWidth: `${monthGroup.weeks.length * 12}px` }}>
-                                {monthGroup.label}
-                            </div>
-                            <div className="flex gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
-                                {monthGroup.weeks.map((week, weekIndex) => (
-                                    <div key={`${monthGroup.year}-${monthGroup.month}-${weekIndex}`} className="flex flex-col gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
-                                        {week.map((date, dayIndex) => {
-                                            if(!date){
-                                                return (
-                                                    <div key={`empty-${dayIndex}`} className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3"/>
-                                                )
-                                            }
-                                            const { count, color } = contributionsByDate[date.toISOString().slice(0, 10)] 
-                                            return (
-                                                <ToolTip key={date.toISOString()} placement="top" title={tooltipContent(date, count)}>
-                                                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3 rounded-sm border cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-2 hover:ring-black hover:ring-opacity-50" style={{ backgroundColor: color }}/>
-                                                </ToolTip>
-                                            )
-                                        })}
-                                    </div>
-                                ))}
-                            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-2 lg:gap-6">
+                {monthGroups.map((monthGroup) => (
+                    <div key={`${monthGroup.year}-${monthGroup.month}`}>
+                        <div className="text-xs sm:text-xs md:text-xs lg:text-xs font-semibold text-gray-600 text-center mb-1 sm:mb-1.5 md:mb-1 lg:mb-2 uppercase tracking-wider" style={{ minWidth: `${monthGroup.weeks.length * 12}px` }}>
+                            {monthGroup.label}
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <p className="text-gray-500 text-center py-8">No contribution data available for {selectedYear}</p>
-            )}
+                        <div className="flex gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
+                            {monthGroup.weeks.map((week, weekIndex) => (
+                                <div key={`${monthGroup.year}-${monthGroup.month}-${weekIndex}`} className="flex flex-col gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
+                                    {week.map((date, dayIndex) => {
+                                        if(!date){
+                                            return <div key={`empty-${dayIndex}`} className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3" />
+                                        }
+                                        const { count } = contributionsByDate[date.toISOString().slice(0, 10)] || { count: 0 };
+                                        const intensity = getIntensity(count);
+                                        return (
+                                            <ToolTip key={date.toISOString()} placement="top" title={tooltipContent(date, count)}>
+                                                <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3 rounded-sm border cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-2 hover:ring-black hover:ring-opacity-50 ${intensity}`} />
+                                            </ToolTip>
+                                        )
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     </div>
+    // <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-sm border relative m-1 sm:m-1.5 md:m-0 lg:m-2">
+    //     <div className="relative px-2 sm:px-3 md:px-3 lg:px-4 pb-2 sm:pb-3 md:pb-3 lg:pb-4">
+    //         {selectedYearData? (
+    //             <div className="t">
+    //                 {.map((monthGroup) => (
+    //                     <div key={`${monthGroup.year}-${monthGroup.month}`}>
+    //                         <div className="text-xs sm:text-xs md:text-xs lg:text-xs font-semibold text-gray-600 text-center mb-1 sm:mb-1.5 md:mb-1 lg:mb-2 uppercase tracking-wider" style={{ minWidth: `${monthGroup.weeks.length * 12}px` }}>
+    //                             {monthGroup.label}
+    //                         </div>
+    //                         <div className="flex gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
+    //                             {monthGroup.weeks.map((week, weekIndex) => (
+    //                                 <div key={`${monthGroup.year}-${monthGroup.month}-${weekIndex}`} className="flex flex-col gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
+    //                                     {week.map((date, dayIndex) => {
+    //                                         if(!date){
+    //                                             return (
+    //                                                 <div key={`empty-${dayIndex}`} className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3"/>
+    //                                             )
+    //                                         }
+    //                                         const { count, color } = contributionsByDate[date.toISOString().slice(0, 10)] 
+    //                                         return (
+    //                                             <ToolTip key={date.toISOString()} placement="top" title={tooltipContent(date, count)}>
+    //                                                 <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3 rounded-sm border cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-2 hover:ring-black hover:ring-opacity-50" style={{ backgroundColor: color }}/>
+    //                                             </ToolTip>
+    //                                         )
+    //                                     })}
+    //                                 </div>
+    //                             ))}
+    //                         </div>
+    //                     </div>
+    //                 ))}
+    //             </div>
+    //         ) : (
+    //             <p className="text-gray-500 text-center py-8">No contribution data available for {selectedYear}</p>
+    //         )}
+    //     </div>
+    // </div>
     )
 }
