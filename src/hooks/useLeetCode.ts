@@ -1,12 +1,12 @@
 "use client"
-import type { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
+import type { LeetCodeCalendarInterface, LeetCodeContestInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
 import axios from "axios"
 import { useState } from "react"
 
 export const useLeetCode = (leetcodeUsername: string) => {
-    const [leetcodeProfile, setLeetcodeProfile] = useState<LeetCodeProfileInterface | null>(null)
-    const [contest, setContest] = useState<LeetcodeContestInterface>();
-    const [submissionCalendar, setSubmissionCalendar] = useState<LeetcodeCalendarInterface | null>(null)
+    const [profile, setProfile] = useState<LeetCodeProfileInterface | null>(null)
+    const [contest, setContest] = useState<LeetCodeContestInterface | null>(null);
+    const [calendar, setCalendar] = useState<LeetCodeCalendarInterface | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
     const [errors, setErrors] = useState<LeetCodeErrorInterface>({});
     const fetchLeetCodeData = async() => {
@@ -14,9 +14,9 @@ export const useLeetCode = (leetcodeUsername: string) => {
         try {
             const response =  await axios.get(`/api/dsa/leetcode/${leetcodeUsername}`)
             const { profileResponse, contestResponse, submissionCalendarResponse, errors } = response.data
-            setLeetcodeProfile(profileResponse)
+            setProfile(profileResponse)
             setContest(contestResponse)
-            setSubmissionCalendar(submissionCalendarResponse)
+            setCalendar(submissionCalendarResponse)
             setErrors(errors || {});
         } 
         catch(err: any){
@@ -30,5 +30,5 @@ export const useLeetCode = (leetcodeUsername: string) => {
             setLoading(false)
         }
     }
-    return { leetcodeProfile, contest, submissionCalendar, loading, errors, fetchLeetCodeData }
+    return { profile, contest, calendar, loading, errors, fetchLeetCodeData }
 }

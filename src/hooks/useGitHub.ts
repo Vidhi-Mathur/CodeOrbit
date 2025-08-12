@@ -15,7 +15,6 @@ export const useGitHub = (githubUsername: string) => {
         try {
             const response =  await axios.get(`/api/dev/github/${githubUsername}`)
             const { profileResponse, reposResponse, calendarResponse } = response.data
-            console.log(calendarResponse)
             setCalendar(calendarResponse)
             setGithubProfile(profileResponse)
             setRepos(reposResponse)
