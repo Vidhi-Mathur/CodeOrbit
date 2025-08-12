@@ -1,4 +1,4 @@
-import type { LeetcodeCalendarInterface, LeetcodeContestInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from '@/interfaces/dsa/leetcode/leetcodeInterface';
+import type { LeetCodeCalendarInterface, LeetCodeContestInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from '@/interfaces/dsa/leetcode/leetcodeInterface';
 import axios from 'axios'
 import { NextRequest } from 'next/server';
 
@@ -78,8 +78,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ leet
         ]);
 
         let profileResponse: LeetCodeProfileInterface | null = null
-        let contestResponse: LeetcodeContestInterface | null = null
-        let submissionCalendarResponse: Record<number, LeetcodeCalendarInterface | null> = {}
+        let contestResponse: LeetCodeContestInterface | null = null
+        let submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null> = {}
         let errors: LeetCodeErrorInterface = {
             profile: undefined,
             contest: undefined,
