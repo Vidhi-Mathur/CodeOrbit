@@ -15,17 +15,17 @@ export interface LeetCodeProfileProps {
 }
 
 export interface SubmissionCalendarProps {
-  calendarMap: Record<number, LeetcodeCalendarInterface>
+  calendarMap: Record<number, LeetCodeCalendarInterface>
 }
 
-export interface LeetcodeCalendarInterface {
+export interface LeetCodeCalendarInterface {
     submissionCalendar: string
     streak: number,
     totalActiveDays: number
     activeYears: number[]
 }
 
-export interface LeetcodeContestInterface {
+export interface LeetCodeContestInterface {
     totalContestAttended: number
     globalRanking: number
     rating: number
@@ -34,7 +34,7 @@ export interface LeetcodeContestInterface {
 }
 
 export interface ContestStatsProps {
-    contest: LeetcodeContestInterface
+    contest: LeetCodeContestInterface
 }
 
 export interface LeetCodeErrorInterface {
