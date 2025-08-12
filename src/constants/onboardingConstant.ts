@@ -107,6 +107,7 @@ export const initialFormData: FormDataInterface = {
         github: "" 
     },
     codingProfiles: {
-        leetcode: ""
+        leetcode: "",
+        codeforces: ""
     }
 }

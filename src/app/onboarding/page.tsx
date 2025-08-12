@@ -84,6 +84,7 @@ export default function OnboardingPage() {
             break
         case 5:
             if(!formData.codingProfiles.leetcode.trim()) errors.leetcode = "LeetCode username is required"
+            if(!formData.codingProfiles.codeforces.trim()) errors.codeforces = "Codeforces username is required"
             break
         }
         setFieldErrors(errors)
@@ -211,7 +212,7 @@ export default function OnboardingPage() {
                 <div className="space-y-5">
                     <h2 className="text-2xl font-bold text-blue-800 mb-6">Coding Profiles</h2>
                     {codingProfilesFields.map((input) => {
-                        const isRequired = input.id === "leetcode"
+                        const isRequired = input.id === "leetcode" || input.id === "codeforces"
                         return (
                             <div key={input.id}>
                                 <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
