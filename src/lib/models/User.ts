@@ -99,7 +99,10 @@ const UserSchema = new schema({
             },
             codeforces: {
                 type: String,
-                required: false,
+                required: function (this: any): boolean {
+                    const parentDoc = this.ownerDocument ? this.ownerDocument() : null;
+                    return parentDoc ? parentDoc.isOnboarded : false;
+                },
             },
             codechef: {
                 type: String,
