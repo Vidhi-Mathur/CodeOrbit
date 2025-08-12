@@ -129,41 +129,5 @@ export const GitHubCalendar = ({ contributions }: GitHubCalendarProps) => {
             </div>
         </div>
     </div>
-    // <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-sm border relative m-1 sm:m-1.5 md:m-0 lg:m-2">
-    //     <div className="relative px-2 sm:px-3 md:px-3 lg:px-4 pb-2 sm:pb-3 md:pb-3 lg:pb-4">
-    //         {selectedYearData? (
-    //             <div className="t">
-    //                 {.map((monthGroup) => (
-    //                     <div key={`${monthGroup.year}-${monthGroup.month}`}>
-    //                         <div className="text-xs sm:text-xs md:text-xs lg:text-xs font-semibold text-gray-600 text-center mb-1 sm:mb-1.5 md:mb-1 lg:mb-2 uppercase tracking-wider" style={{ minWidth: `${monthGroup.weeks.length * 12}px` }}>
-    //                             {monthGroup.label}
-    //                         </div>
-    //                         <div className="flex gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
-    //                             {monthGroup.weeks.map((week, weekIndex) => (
-    //                                 <div key={`${monthGroup.year}-${monthGroup.month}-${weekIndex}`} className="flex flex-col gap-[1px] sm:gap-[1.5px] md:gap-[1px] lg:gap-[2px]">
-    //                                     {week.map((date, dayIndex) => {
-    //                                         if(!date){
-    //                                             return (
-    //                                                 <div key={`empty-${dayIndex}`} className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3"/>
-    //                                             )
-    //                                         }
-    //                                         const { count, color } = contributionsByDate[date.toISOString().slice(0, 10)] 
-    //                                         return (
-    //                                             <ToolTip key={date.toISOString()} placement="top" title={tooltipContent(date, count)}>
-    //                                                 <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-2 md:h-2 lg:w-3 lg:h-3 rounded-sm border cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-2 hover:ring-black hover:ring-opacity-50" style={{ backgroundColor: color }}/>
-    //                                             </ToolTip>
-    //                                         )
-    //                                     })}
-    //                                 </div>
-    //                             ))}
-    //                         </div>
-    //                     </div>
-    //                 ))}
-    //             </div>
-    //         ) : (
-    //             <p className="text-gray-500 text-center py-8">No contribution data available for {selectedYear}</p>
-    //         )}
-    //     </div>
-    // </div>
     )
 }
