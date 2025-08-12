@@ -8,9 +8,12 @@ import { LeetCodeProfile } from "@/components/dsa/leetcode/LeetCodeProfile"
 import { LeetCodeContest } from "../dsa/leetcode/LeetCodeContest"
 import { LeetCodeCalendar } from "./leetcode/LeetCodeCalendar"
 import { ShimmerProfile, ShimmerCalendar, ShimmerContest } from "@/components/ui/ShimmerUI"
+import { useCodeForces } from "@/hooks/useCodeForces"
+import { CodeForcesProfile } from "./codeforces/CodeForcesProfile"
 
 export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
-    const { leetcodeProfile, contest, submissionCalendar, loading: leetcodeLoading, errors: leetcodeErrors, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
+    const { profile: leetcodeProfile, contest: leetcodeContest, calendar: leetcodeCalendar, loading: leetcodeLoading, errors: leetcodeErrors, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
+    const { profile: codeforcesProfile, loading: codeforcesLoading, errors: codeforcesErrors, fetchCodeForcesData } = useCodeForces(user.platforms.dsa.codeforces)
 
     const platformClickHandler = (platform: DsaLink | DevLink) => {
         onPlatformChange(platform)
@@ -18,6 +21,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             switch(platform as DsaLink){
                 case "leetcode":
                     fetchLeetCodeData()
+                    break
+                case "codeforces":
+                    fetchCodeForcesData()
                     break
                 default:
                     console.log("Implement Handler")
@@ -49,13 +55,13 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                         {leetcodeErrors.calendar}
                     </div>
                     ): (
-                    submissionCalendar && (
+                    leetcodeCalendar && (
                     <div className="p-2 sm:p-3">
                         <LeetCodeCalendar
                             calendarMap={
-                                typeof submissionCalendar === "object" && "submissionCalendar" in submissionCalendar
-                                  ? { [new Date().getFullYear()]: submissionCalendar }
-                                  : submissionCalendar}
+                                typeof leetcodeCalendar === "object" && "submissionCalendar" in leetcodeCalendar
+                                  ? { [new Date().getFullYear()]: leetcodeCalendar }
+                                  : leetcodeCalendar}
                             />
                     </div>
                 ))}
@@ -64,9 +70,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                         {leetcodeErrors.contest}
                     </div>
                     ): (
-                    contest && (
+                    leetcodeContest && (
                         <div className="p-2 sm:p-3">
-                            <LeetCodeContest contest={contest} />
+                            <LeetCodeContest contest={leetcodeContest} />
                         </div>
                     )
                 )}
@@ -75,6 +81,48 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             </>
         )
     }
+    // else if(activePlatform === "codeforces"){
+    //     return (
+    //     <>
+    //     {codeforcesLoading && (
+    //         <>
+    //         <ShimmerCalendar />
+    //         <ShimmerContest />
+    //         </>
+    //     )}
+    //     {!codeforcesLoading && (
+    //         <>
+    //         {codeforcesErrors.calendar? (
+    //             <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
+    //                 {codeforcesErrors.calendar}
+    //             </div>
+    //             ): (
+    //             codeforcesCalendar && (
+    //             <div className="p-2 sm:p-3">
+    //                 <CodeForcesCalendar
+    //                     calendarMap={
+    //                         typeof codeforcesCalendar === "object" && "submissionCalendar" in codeforcesCalendar
+    //                           ? { [new Date().getFullYear()]: codeforcesCalendar }
+    //                           : codeforcesCalendar}
+    //                     />
+    //             </div>
+    //         ))}
+    //         {codeforcesErrors.contest ? (
+    //             <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
+    //                 {codeforcesErrors.contest}
+    //             </div>
+    //             ): (
+    //             codeforcesContest && (
+    //                 <div className="p-2 sm:p-3">
+    //                     <CodeForcesContest contest={codeforcesContest} />
+    //                 </div>
+    //             )
+    //         )}
+    //         </>
+    //     )}
+    //     </>
+    //     )
+    // }
     return null
   }
 
@@ -89,6 +137,20 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                     </div>
                 ): (
                     leetcodeProfile && <LeetCodeProfile profile={leetcodeProfile} />
+                )}
+                </>
+            )
+        }
+        else if(activePlatform === "codeforces"){
+            return (
+                <>
+                {codeforcesLoading && <ShimmerProfile />}
+                {codeforcesErrors.profile? (
+                    <div className="sm:-mt-15 lg:-mt-20 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
+                        {codeforcesErrors.profile}
+                    </div>
+                ): (
+                    codeforcesProfile && <CodeForcesProfile profile={codeforcesProfile} />
                 )}
                 </>
             )
