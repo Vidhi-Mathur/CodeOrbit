@@ -11,6 +11,10 @@ export const useLeetCode = (leetcodeUsername: string) => {
     const [errors, setErrors] = useState<LeetCodeErrorInterface>({});
     const fetchLeetCodeData = async() => {
         setLoading(true)
+        setErrors({})
+        setProfile(null)
+        setContest(null)
+        setCalendar(null)
         try {
             const response =  await axios.get(`/api/dsa/leetcode/${leetcodeUsername}`)
             const { profileResponse, contestResponse, submissionCalendarResponse, errors } = response.data
