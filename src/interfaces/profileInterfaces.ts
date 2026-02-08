@@ -16,6 +16,7 @@ export interface SectionProps {
     activePlatform: DsaLink | DevLink
     onPlatformChange: (platform: DsaLink | DevLink) => void
     renderSidebarOnly?: boolean
+    refresh?: number
 }
 
 export interface AboutProps extends SideBarProps {

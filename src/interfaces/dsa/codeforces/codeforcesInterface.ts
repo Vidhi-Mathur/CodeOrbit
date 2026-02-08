@@ -8,16 +8,13 @@ export interface CodeForcesContestInterface {
     totalContestAttended: number
     currRating: number
     maxRating: number
-    contestId: number
-    contestName: string
-    contestRank: string
-    contestRating: number
+    contestHistory: CodeForcesContestHistoryInterface[]
 }
 
 export interface CodeForcesErrorInterface {
     profile?: string
     contest?: string
-    calendar?: string
+    problemBreakdown?: string
 }
 
 export interface CodeForcesCalendarInterface {
@@ -29,4 +26,26 @@ export interface CodeForcesCalendarInterface {
 
 export interface CodeForcesProfileProps {
     profile: CodeForcesProfileInterface
+}
+
+export interface ContestStatsProps {
+    contest: CodeForcesContestInterface
+}
+
+export interface CodeForcesContestHistoryInterface {
+    contestId: number
+    contestName: string
+    contestRank: string
+    contestRating: number
+    contestTime: number
+}
+
+export interface ProblemBreakdownInterface {
+    rating: number
+    count: number
+    percentage: number
+}
+
+export interface CodeForcesProblemBreakdownProps {
+    problemBreakdown: ProblemBreakdownInterface[]
 }
