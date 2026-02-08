@@ -6,7 +6,7 @@ const ShimmerEffect = ({ className = "" }) => {
 
 export const ShimmerProfile = () => {
     return (
-        <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative">
+        <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative m-4">
             <div className="bg-[#1A1B2E] p-5 text-white">
                 <div className="flex items-center gap-4">
                     <ShimmerEffect className="h-8 w-40 bg-gray-700 rounded-md" />
