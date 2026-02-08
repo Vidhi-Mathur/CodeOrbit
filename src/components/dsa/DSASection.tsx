@@ -1,24 +1,29 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import DSAStats from "./DSAStats"
+import { ShimmerCalendar, ShimmerContest, ShimmerProfile } from "../ui/ShimmerUI"
 import type { SectionProps } from "@/interfaces/profileInterfaces"
 import { type DsaLink, type DevLink, dsaLinks } from "@/constants/profileConstant"
 import { useLeetCode } from "@/hooks/useLeetCode"
-import DSAStats from "@/components/dsa/DSAStats"
-import { LeetCodeProfile } from "@/components/dsa/leetcode/LeetCodeProfile"
-import { LeetCodeContest } from "../dsa/leetcode/LeetCodeContest"
+import { LeetCodeProfile } from "./leetcode/LeetCodeProfile"
+import { LeetCodeContest } from "./leetcode/LeetCodeContest"
 import { LeetCodeCalendar } from "./leetcode/LeetCodeCalendar"
-import { ShimmerProfile, ShimmerCalendar, ShimmerContest } from "@/components/ui/ShimmerUI"
 import { useCodeForces } from "@/hooks/useCodeForces"
 import { CodeForcesProfile } from "./codeforces/CodeForcesProfile"
+import { CodeForcesContest } from "./codeforces/CodeForcesContest"
+import { CodeForcesProblemBreakdown } from "./codeforces/CodeForcesProblemBreakdown"
 
-export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
+export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false, refresh }: SectionProps) => {
     const { profile: leetcodeProfile, contest: leetcodeContest, calendar: leetcodeCalendar, loading: leetcodeLoading, errors: leetcodeErrors, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
-    const { profile: codeforcesProfile, loading: codeforcesLoading, errors: codeforcesErrors, fetchCodeForcesData } = useCodeForces(user.platforms.dsa.codeforces)
+    const { profile: codeforcesProfile, contest: codeforcesContest, problemBreakdown: codeforcesProblemBreakdown, loading: codeforcesLoading, errors: codeforcesErrors, fetchCodeForcesData } = useCodeForces(user.platforms.dsa.codeforces)
 
     const platformClickHandler = (platform: DsaLink | DevLink) => {
         onPlatformChange(platform)
-        if(dsaLinks.includes(platform as DsaLink)){
-            switch(platform as DsaLink){
+    }
+
+    useEffect(() => {
+        if(dsaLinks.includes(activePlatform as DsaLink)){
+            switch(activePlatform as DsaLink){
                 case "leetcode":
                     fetchLeetCodeData()
                     break
@@ -27,15 +32,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                     break
                 default:
                     console.log("Implement Handler")
-            }     
+            }  
         }
-    }
-
-    useEffect(() => {
-        if(dsaLinks.includes(activePlatform as DsaLink)){
-            platformClickHandler(activePlatform)
-        }
-    }, [activePlatform])
+    }, [activePlatform, refresh])
 
     //Render sidebar content only
     if(renderSidebarOnly){
@@ -51,7 +50,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             {!leetcodeLoading && (
                 <>
                 {leetcodeErrors.calendar? (
-                    <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
+                    <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base m-2">
                         {leetcodeErrors.calendar}
                     </div>
                     ): (
@@ -66,7 +65,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                     </div>
                 ))}
                 {leetcodeErrors.contest ? (
-                    <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
+                    <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base m-2">
                         {leetcodeErrors.contest}
                     </div>
                     ): (
@@ -81,48 +80,32 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             </>
         )
     }
-    // else if(activePlatform === "codeforces"){
-    //     return (
-    //     <>
-    //     {codeforcesLoading && (
-    //         <>
-    //         <ShimmerCalendar />
-    //         <ShimmerContest />
-    //         </>
-    //     )}
-    //     {!codeforcesLoading && (
-    //         <>
-    //         {codeforcesErrors.calendar? (
-    //             <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
-    //                 {codeforcesErrors.calendar}
-    //             </div>
-    //             ): (
-    //             codeforcesCalendar && (
-    //             <div className="p-2 sm:p-3">
-    //                 <CodeForcesCalendar
-    //                     calendarMap={
-    //                         typeof codeforcesCalendar === "object" && "submissionCalendar" in codeforcesCalendar
-    //                           ? { [new Date().getFullYear()]: codeforcesCalendar }
-    //                           : codeforcesCalendar}
-    //                     />
-    //             </div>
-    //         ))}
-    //         {codeforcesErrors.contest ? (
-    //             <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base ml-2 mr-2">
-    //                 {codeforcesErrors.contest}
-    //             </div>
-    //             ): (
-    //             codeforcesContest && (
-    //                 <div className="p-2 sm:p-3">
-    //                     <CodeForcesContest contest={codeforcesContest} />
-    //                 </div>
-    //             )
-    //         )}
-    //         </>
-    //     )}
-    //     </>
-    //     )
-    // }
+    else if(activePlatform === "codeforces"){
+        return (
+        <>
+        {codeforcesLoading && (
+            <>
+            <ShimmerContest />
+            </>
+        )}
+        {!codeforcesLoading && (
+            <>
+            {codeforcesErrors.problemBreakdown? (
+                <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base m-2">
+                    {codeforcesErrors.problemBreakdown}
+                </div>
+                ): (
+                codeforcesProblemBreakdown && (
+                <div className="p-2 sm:p-3">
+                    <CodeForcesProblemBreakdown problemBreakdown={codeforcesProblemBreakdown} />
+                </div>
+            ))}
+            
+            </>
+        )}
+        </>
+        )
+    }
     return null
   }
 
@@ -144,7 +127,12 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
         else if(activePlatform === "codeforces"){
             return (
                 <>
-                {codeforcesLoading && <ShimmerProfile />}
+                {codeforcesLoading && (
+                <>
+                <ShimmerProfile />
+                <ShimmerProfile />
+                </>
+            )}
                 {codeforcesErrors.profile? (
                     <div className="sm:-mt-15 lg:-mt-20 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
                         {codeforcesErrors.profile}
@@ -152,6 +140,17 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                 ): (
                     codeforcesProfile && <CodeForcesProfile profile={codeforcesProfile} />
                 )}
+                {codeforcesErrors.contest? (
+                <div className="bg-red-50 ml-2 sm:ml-3 lg:ml-12 mt-3 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
+                    {codeforcesErrors.contest}
+                </div>
+                ): (
+                codeforcesContest && (
+                    <div className="p-2 sm:p-3">
+                        <CodeForcesContest contest={codeforcesContest} />
+                    </div>
+                )
+            )} 
                 </>
             )
         }
