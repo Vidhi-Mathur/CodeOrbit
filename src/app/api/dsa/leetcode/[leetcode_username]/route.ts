@@ -124,6 +124,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ leet
                     topPercentage: contest.topPercentage
                 }
             }
+            else {
+                return new Response(JSON.stringify({ error: "Leetcode contest not found" }), { status: 404 });
+            }
         }
         else {
             errors.contest = contestRes.reason?.message || 'Failed to fetch contest';
