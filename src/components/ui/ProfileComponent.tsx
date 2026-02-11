@@ -9,7 +9,6 @@ import { DevSection } from "../dev/DevSection"
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
     const [activeTab, setActiveTab] = useState<ProfileTabs>(PROFILE_TABS.PROBLEM_SOLVING)
     const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>("leetcode")
-    //TODO: for github too
     const [refresh, setRefresh] = useState<number>(0)
 
     const tabChangeHandler = (tab: ProfileTabs) => {
@@ -29,28 +28,33 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
     }
 
     const platformChangeHandler = (platform: DsaLink | DevLink) => {
+        if(platform === activePlatform) return
         setActivePlatform(platform)
+    }
+
+    const refreshHandler = () => {
+        console.log("Refreshing data...")
         setRefresh(prev => prev + 1)
     }
 
-  return (
+    return (
     <div className="flex flex-col lg:flex-row h-screen w-full overflow-y-auto scrollbar-hide">
         <div className="flex flex-col w-full lg:w-3/4">
-            <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} />
+            <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} onRefresh={refreshHandler} />
             <div className="bg-blue-200 flex-1 lg:h-[calc(3/4*100vh)] overflow-y-auto scrollbar-hide">
                 {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
-                    <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} refresh={refresh}/>
+                    <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} refresh={refresh} />
                 )}
                 {activeTab === PROFILE_TABS.DEVELOPMENT && (
-                    <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} />
+                    <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} refresh={refresh}/>
                 )}
                 <div className="block lg:hidden bg-cyan-200 mt-4">
                     <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
                         {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
-                            <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh} />
+                            <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh}/>
                         )}
                         {activeTab === PROFILE_TABS.DEVELOPMENT && (
-                            <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
+                            <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh} />
                         )}
                     </div>
                 </div>
@@ -58,10 +62,10 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
         </div>
         <div className="hidden lg:block lg:w-1/4 bg-cyan-200 pt-[80px] overflow-y-auto h-screen scrollbar-hide">
             {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
-                <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh} />
+                <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh}/>
             )}
             {activeTab === PROFILE_TABS.DEVELOPMENT && (
-                <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
+                <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh} />
             )}
         </div>
     </div>

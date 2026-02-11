@@ -11,9 +11,9 @@ export const CurvedNav = ({ activeTab, setActiveTab }: CurvedNavProps) => {
         [PROFILE_TABS.DEVELOPMENT]: null
     });
     //State to track positions for the curved elements
-    const [activePosition, setActivePosition] = useState({ left: 0, width: 0 })
+    const [activePosition, setActivePosition] = useState<{ left: number, width: number }>({ left: 0, width: 0 })
     //State to track screen size,, default = lg
-    const [screenWidth, setScreenWidth] = useState(1024) 
+    const [screenWidth, setScreenWidth] = useState<number>(1024) 
 
     //Update screen width on client side only
     useEffect(() => {

@@ -9,7 +9,7 @@ import { CameraAlt } from "@mui/icons-material"
 
 const ImageCarousel = () => {
     const [screenSize, setScreenSize] = useState<ScreenSize>(ScreenSize.Desktop)
-    const [isClient, setIsClient] = useState(false)
+    const [isClient, setIsClient] = useState<boolean>(false)
 
     useEffect(() => {
         setIsClient(true)

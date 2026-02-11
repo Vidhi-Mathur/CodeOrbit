@@ -8,7 +8,7 @@ import { signOut } from "next-auth/react"
 import { SideBarProps } from "@/interfaces/hompageInterface";
 
 export const SideBar = ({name, username, image}: SideBarProps) => {
-    const [isOpen, setOpen] = useState(false)
+    const [isOpen, setOpen] = useState<boolean>(false)
     const sidebarRef = useRef<HTMLDivElement>(null)
     const profileRef = useRef<HTMLDivElement>(null)
     useEffect(() => {

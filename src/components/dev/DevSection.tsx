@@ -9,25 +9,22 @@ import { GitHubRepo } from "@/components/dev/github/GitHubRepo"
 import { ShimmerProfile, ShimmerRepo, ShimmerCalendar } from "@/components/ui/ShimmerUI"
 import { GitHubCalendar } from "./github/GitHubCalendar"
 
-export const DevSection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
+export const DevSection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false, refresh }: SectionProps) => {
     const { githubProfile, repos, loading: githubLoading, calendar, error: githubError, fetchGitHubData } = useGitHub(user.platforms.dev.github)
 
     const platformClickHandler = (platform: DsaLink | DevLink) => {
         onPlatformChange(platform)
-        if(devLinks.includes(platform as DevLink)){
-            switch(platform as DevLink){
+    }
+    
+    useEffect(() => {
+        if(devLinks.includes(activePlatform as DevLink)){
+            switch(activePlatform as DevLink){
                 case "github":
                     fetchGitHubData()
                     break
             }
         }
-    }
-    
-    useEffect(() => {
-        if(devLinks.includes(activePlatform as DevLink)){
-            platformClickHandler(activePlatform)
-        }
-    }, [activePlatform])
+    }, [activePlatform, refresh])
     
     if(renderSidebarOnly){
         return (
