@@ -1,12 +1,12 @@
 "use client"
-import type { GitHubProfileInterface, GitHubRepoInterface } from "@/interfaces/dev/github/githubInterface"
+import { type GitHubCalendarInterface, type GitHubProfileInterface, type GitHubRepoInterface } from "@/interfaces/dev/github/githubInterface"
 import axios from "axios"
 import { useState } from "react"
 
 export const useGitHub = (githubUsername: string) => {
     const [githubProfile, setGithubProfile] = useState<GitHubProfileInterface | null>(null)
     const [repos, setRepos] = useState<GitHubRepoInterface[]>([])
-    const [calendar, setCalendar] = useState()
+    const [calendar, setCalendar] = useState<GitHubCalendarInterface | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const fetchGitHubData = async() => {
