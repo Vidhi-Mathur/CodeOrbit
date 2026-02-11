@@ -16,7 +16,7 @@ export interface SectionProps {
     activePlatform: DsaLink | DevLink
     onPlatformChange: (platform: DsaLink | DevLink) => void
     renderSidebarOnly?: boolean
-    refresh?: number
+    refresh: number
 }
 
 export interface AboutProps extends SideBarProps {
@@ -47,6 +47,7 @@ export interface ProfileHeaderProps {
     user: ProfileComponentProps["user"]
     activeTab: ProfileTabs
     onTabChange: (tab: ProfileTabs) => void
+    onRefresh: () => void
 }
 
 export interface EducationInterface {
