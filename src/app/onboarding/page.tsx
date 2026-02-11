@@ -12,7 +12,7 @@ export default function OnboardingPage() {
     const router = useRouter()
     const [currentStep, setCurrentStep] = useState<number>(1)
     const [formData, setFormData] = useState<FormDataInterface>(initialFormData)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
