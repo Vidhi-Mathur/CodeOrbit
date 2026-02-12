@@ -32,9 +32,9 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
         setActivePlatform(platform)
     }
 
-    const refreshHandler = () => {
-        console.log("Refreshing data...")
+    const refreshHandler = async() => {
         setRefresh(prev => prev + 1)
+        await fetch(`/api/dev/github/${user.platforms.dev.github}/refresh`, { method: "POST" })
     }
 
     return (
