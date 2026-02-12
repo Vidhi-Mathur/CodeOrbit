@@ -20,7 +20,6 @@ export const useGitHub = (githubUsername: string) => {
             setRepos(reposResponse)
         } 
         catch(err: any){
-            console.error("API call failed", err)
             let message = err.response?.data?.error || "Failed to load GitHub profile"
             setError(message)
         } 
