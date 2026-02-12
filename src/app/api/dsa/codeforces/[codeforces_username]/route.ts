@@ -6,7 +6,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     const { codeforces_username } = await params
 
     if(!codeforces_username){
-        return new Response(JSON.stringify({ error: "Username is required" }), { status: 400 });
+        return Response.json({ error: "Codeforces username is required" }, { status: 400 });
     }
 
     try {
@@ -111,9 +111,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
         else {
             errors.problemBreakdown = problemBreakdownRes.reason?.message || 'Failed to fetch problem breakdown';
         }
-        return new Response(JSON.stringify({ profileResponse, contestResponse, problemBreakdownResponse, errors }), { status: 200 })
+        return Response.json({ profileResponse, contestResponse, problemBreakdownResponse, errors }, { status: 200 })
     }
     catch(err: any){
-        return new Response(JSON.stringify({ error: "Failed to fetch Codeforces profile data" }), { status: 500 })
+        return Response.json({ error: "Failed to fetch Codeforces profile data" }, { status: 500 })
     }
 }
