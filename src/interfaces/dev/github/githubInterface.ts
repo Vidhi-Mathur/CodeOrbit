@@ -47,3 +47,9 @@ export interface GitHubCalendarInterface {
 export interface GitHubCalendarProps {
     contributions: GitHubCalendarInterface
 }
+
+export interface GitHubDataInterface {
+    profileResponse: GitHubProfileInterface
+    reposResponse: GitHubRepoInterface[]
+    calendarResponse: GitHubCalendarInterface
+}
