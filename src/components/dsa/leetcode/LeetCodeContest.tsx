@@ -8,6 +8,8 @@ import { formatNumber, formatRating, getRatingColor } from "@/lib/helper"
 
 export const LeetCodeContest = ({ contest }: ContestStatsProps) => {
   const { totalContestAttended, rating, globalRanking, totalParticipants, topPercentage } = contest
+  const hasContests = !!contest && (contest.totalContestAttended ?? 0) > 0;
+
   return (
     <div className="bg-white rounded-lg sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-sm border m-1 sm:m-1.5 md:m-0 lg:m-2">
         <div className="mb-3 sm:mb-3 md:mb-3 lg:mb-4">
@@ -17,12 +19,11 @@ export const LeetCodeContest = ({ contest }: ContestStatsProps) => {
                 </h3>
             </div>
             <div className="px-2 sm:px-3 md:px-3 lg:px-4 space-y-3 sm:space-y-3 md:space-y-3 lg:space-y-4">
-                {!contest || totalContestAttended === 0 && (
+                {!hasContests? (
                     <div className="flex items-center justify-center h-24 sm:h-32 md:h-40 lg:h-48">
                         <p className="text-gray-500 text-sm sm:text-base md:text-sm lg:text-base">💡No contest attended yet!!!</p>
                     </div>
-                )}
-                {contest && totalContestAttended > 0 && (
+                ): (
                     <>
                     <div className="flex items-center justify-between p-2 sm:p-2.5 md:p-2.5 lg:p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-2 sm:gap-2.5 md:gap-2.5 lg:gap-3">

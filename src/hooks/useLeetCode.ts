@@ -25,9 +25,9 @@ export const useLeetCode = (leetcodeUsername: string) => {
         } 
         catch(err: any){
             setErrors({
-                profile: "Failed to load profile",
-                contest: "Failed to load contest",
-                calendar: "Failed to load calendar"
+                profile: err?.response?.data?.error || "Failed to load Leetcode profile",
+                contest: err?.response?.data?.error || "Failed to load Leetcode contest",
+                calendar: err?.response?.data?.error || "Failed to load Leetcode calendar"
             }); 
         } 
         finally{

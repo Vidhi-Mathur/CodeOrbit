@@ -8,7 +8,19 @@ import { formatDate } from "@/lib/helper"
 export const GitHubRepo = ({ repos }: { repos: GitHubRepoInterface[] }) => {
     return (
         <div className="space-y-3 sm:space-y-3 md:space-y-3 lg:space-y-4">
-            {repos.map((repo) => {
+            {(!repos || repos.length === 0) && (
+                <div className="bg-white rounded-xl sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative border border-cyan-300/70 hover:border-black">
+                    <div className="bg-[#1A1B2E] px-3 sm:px-4 md:px-4 lg:px-5 py-2.5 sm:py-3 md:py-3 lg:py-4">
+                        <h3 className="text-sm sm:text-base md:text-base lg:text-lg font-bold text-white leading-tight tracking-wider">
+                            Github Repositories
+                        </h3>
+                    </div>
+                    <div className="flex items-center justify-center h-24 sm:h-32 md:h-40 lg:h-48">
+                        <p className="text-gray-500 text-sm sm:text-base md:text-sm lg:text-base">💡No public repositories available!!!</p>
+                    </div>
+                </div>
+            )}
+            {repos && repos.map((repo) => {
                 return (
                     <div className="bg-white rounded-xl sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative border border-cyan-300/70 hover:border-black" key={repo.name}>
                         <div className="bg-[#1A1B2E] px-3 sm:px-4 md:px-4 lg:px-5 py-2.5 sm:py-3 md:py-3 lg:py-4">

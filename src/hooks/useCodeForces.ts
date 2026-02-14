@@ -25,9 +25,9 @@ export const useCodeForces = (codeforcesUsername: string) => {
         } 
         catch(err: any){
             setErrors({
-                profile: "Failed to load profile",
-                contest: "Failed to load contest",
-                problemBreakdown: "Failed to load problem"
+                profile: err?.response?.data?.error || "Failed to load profile",
+                contest: err?.response?.data?.error || "Failed to load contest",
+                problemBreakdown: err?.response?.data?.error ||"Failed to load problem"
             }); 
         } 
         finally{

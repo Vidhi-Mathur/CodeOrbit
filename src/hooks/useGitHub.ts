@@ -1,5 +1,5 @@
 "use client"
-import { type GitHubCalendarInterface, type GitHubProfileInterface, type GitHubRepoInterface } from "@/interfaces/dev/github/githubInterface"
+import { type GithubErrorInterface, type GitHubCalendarInterface, type GitHubProfileInterface, type GitHubRepoInterface } from "@/interfaces/dev/github/githubInterface"
 import axios from "axios"
 import { useState } from "react"
 
@@ -8,24 +8,30 @@ export const useGitHub = (githubUsername: string) => {
     const [repos, setRepos] = useState<GitHubRepoInterface[]>([])
     const [calendar, setCalendar] = useState<GitHubCalendarInterface | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null)
+    const [errors, setErrors] = useState<GithubErrorInterface>({})
     const fetchGitHubData = async() => {
         setLoading(true)
-        setError(null)
+        setCalendar(null)
+        setGithubProfile(null)
+        setRepos([])
+        setErrors({})
         try {
             const response =  await axios.get(`/api/dev/github/${githubUsername}`)
-            const { profileResponse, reposResponse, calendarResponse } = response.data
+            const { profileResponse, reposResponse, calendarResponse, errors } = response.data
             setCalendar(calendarResponse)
             setGithubProfile(profileResponse)
             setRepos(reposResponse)
+            setErrors(errors || {})  
         } 
         catch(err: any){
-            let message = err.response?.data?.error || "Failed to load GitHub profile"
-            setError(message)
+            setErrors({
+                profile: err?.response?.data?.error || "Failed to load GitHub profile",
+                calendar: err?.response?.data?.error || "Failed to load Github contribution calendar"
+            })
         } 
         finally{
             setLoading(false)
         }
     }
-    return { githubProfile, repos, calendar, loading, error, fetchGitHubData  }
+    return { githubProfile, repos, calendar, loading, errors, fetchGitHubData }
 }
