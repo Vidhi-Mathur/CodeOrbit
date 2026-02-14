@@ -124,11 +124,18 @@ export const CodeForcesContest = ({ contest }: ContestStatsProps) => {
                     </div>
                 </div>
             </div>
-            <div className="p-0.5 sm:p-3">
-                <div className="h-[180px] sm:h-[400px] md:h-[500px] lg:h-[650px]">
-                    <Line data={chartData} options={chartOptions} />
+            {contestHistory && contestHistory.length > 0 && (
+                <div className="p-0.5 sm:p-3">
+                    <div className="h-[180px] sm:h-[400px] md:h-[500px] lg:h-[650px]">
+                        <Line data={chartData} options={chartOptions} />
+                    </div>
                 </div>
-            </div>
+            )}
+            {!contestHistory || contestHistory.length === 0 && (
+                <div className="flex items-center justify-center h-28 sm:h-32 md:h-36 lg:h-40 bg-gray-50 rounded-lg m-2 sm:m-3 md:m-3 lg:m-4">
+                    <p className="text-gray-500 text-sm sm:text-base md:text-sm lg:text-base">💡No contest attended yet!!!</p>
+                </div>
+            )}
         </div>
     )
 }

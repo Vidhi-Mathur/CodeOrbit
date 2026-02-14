@@ -16,7 +16,7 @@ export const CodeForcesProfile = ({ profile }: CodeForcesProfileProps) => {
             <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-3 sm:gap-4 md:gap-3 lg:gap-4 mb-4 sm:mb-5 md:mb-4 lg:mb-6">
                 <div className="flex-1 bg-cyan-200 p-3 sm:p-3.5 md:p-3 lg:p-4 rounded-lg text-center">
                     <div className="text-xl sm:text-xl md:text-lg lg:text-2xl font-black text-[#1A1B2E] tracking-tight">
-                        {maxRank}
+                        {maxRank ?? "Unrated"}
                     </div>
                     <div className="text-gray-700 font-semibold text-xs sm:text-sm md:text-xs lg:text-sm uppercase tracking-wider">
                         Maximum Rank
@@ -24,7 +24,7 @@ export const CodeForcesProfile = ({ profile }: CodeForcesProfileProps) => {
                 </div>
                 <div className="flex-1 bg-blue-200 p-3 sm:p-3.5 md:p-3 lg:p-4 rounded-lg text-center">
                     <div className="text-xl sm:text-xl md:text-lg lg:text-2xl font-black text-[#1A1B2E] tracking-tight">
-                        {currRank}
+                        {currRank ?? "Unrated"}
                     </div>
                     <div className="text-gray-700 font-semibold text-xs sm:text-sm md:text-xs lg:text-sm uppercase tracking-wider">
                         Current Rank

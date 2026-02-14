@@ -94,7 +94,12 @@ export const CodeForcesProblemBreakdown = ({ problemBreakdown }: CodeForcesProbl
                 </h3>
             </div>
             <div className="h-56 sm:h-64 md:h-72 lg:h-80 px-2 sm:px-3 md:px-4">
-                <Bar data={data} options={chartOptions} />
+                {problemBreakdown && problemBreakdown.length > 0 && problemBreakdown.some(p => p.count > 0) && <Bar data={data} options={chartOptions} />}
+                {!problemBreakdown || problemBreakdown.length === 0 || problemBreakdown.every(p => p.count === 0) && (
+                    <div className="flex items-center justify-center h-full">
+                        <p className="text-gray-500 text-sm sm:text-base md:text-sm lg:text-base">💡No problems solved yet!!!</p>
+                    </div>
+                )}
             </div>
       </div>
     </div>

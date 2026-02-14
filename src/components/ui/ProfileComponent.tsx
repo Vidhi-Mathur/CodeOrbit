@@ -11,6 +11,12 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
     const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>("leetcode")
     const [refresh, setRefresh] = useState<number>(0)
 
+    const getUsername = (platform: DsaLink | DevLink): string | undefined => {
+        if(dsaLinks.includes(platform as DsaLink)) return user.platforms.dsa?.[platform as keyof typeof user.platforms.dsa]
+        else if(devLinks.includes(platform as DevLink)) return user.platforms.dev?.[platform as keyof typeof user.platforms.dev]
+        return undefined
+    }
+
     const tabChangeHandler = (tab: ProfileTabs) => {
         setActiveTab(tab)
         if(tab === PROFILE_TABS.PROBLEM_SOLVING){
@@ -33,8 +39,15 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
     }
 
     const refreshHandler = async() => {
+        await fetch(`/api/refresh`, { 
+            method: "POST" ,
+            body: JSON.stringify({
+                platform: activePlatform,
+                //TODO: Make it generic for all platforms
+                username: getUsername(activePlatform)
+            })
+        })
         setRefresh(prev => prev + 1)
-        await fetch(`/api/dev/github/${user.platforms.dev.github}/refresh`, { method: "POST" })
     }
 
     return (
