@@ -59,3 +59,10 @@ interface LeetCodeLanguageStat {
     languageName: string
     problemsSolved: number
 } 
+
+export interface LeetCodeDataInterface {
+    profileResponse: LeetCodeProfileInterface | null
+    contestResponse: LeetCodeContestInterface | null
+    submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null>
+    errors: LeetCodeErrorInterface
+}

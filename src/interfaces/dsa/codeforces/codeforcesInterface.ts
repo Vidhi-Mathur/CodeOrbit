@@ -49,3 +49,10 @@ export interface ProblemBreakdownInterface {
 export interface CodeForcesProblemBreakdownProps {
     problemBreakdown: ProblemBreakdownInterface[]
 }
+
+export interface CodeForcesDataInterface {
+    profileResponse: CodeForcesProfileInterface | null
+    contestResponse: CodeForcesContestInterface | null
+    problemBreakdownResponse: ProblemBreakdownInterface[] | null
+    errors: CodeForcesErrorInterface
+}

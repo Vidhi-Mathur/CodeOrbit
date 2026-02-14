@@ -48,8 +48,14 @@ export interface GitHubCalendarProps {
     contributions: GitHubCalendarInterface
 }
 
+export interface GithubErrorInterface {
+    profile?: string
+    calendar?: string
+}
+
 export interface GitHubDataInterface {
     profileResponse: GitHubProfileInterface
     reposResponse: GitHubRepoInterface[]
     calendarResponse: GitHubCalendarInterface
+    errors: GithubErrorInterface
 }
