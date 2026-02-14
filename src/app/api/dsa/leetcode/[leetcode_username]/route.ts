@@ -64,96 +64,93 @@ const fetchLeetcodeData = async(leetcode_username: string): Promise<LeetCodeData
     const headers = {
             'Content-Type': 'application/json',
             Referer: `https://leetcode.com/${leetcode_username}/`,
-        }
-        const [profileRes, contestRes, initialCalendarRes] = await Promise.allSettled([
-            axios.post('https://leetcode.com/graphql', { query: profileQuery, variables: { leetcode_username } }, { headers }),
-            axios.post('https://leetcode.com/graphql', { query: contestQuery, variables: { leetcode_username } }, { headers }),
-            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year: new Date().getFullYear() } }, { headers })
-        ]);
-
-        let profileResponse: LeetCodeProfileInterface | null = null
-        let contestResponse: LeetCodeContestInterface | null = null
-        let submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null> = {}
-        let errors: LeetCodeErrorInterface = {
-            profile: undefined,
-            contest: undefined,
-            calendar: undefined
-        }
-
-        if(profileRes.status === 'fulfilled'){
-            const matchedUser = profileRes.value.data.data?.matchedUser;
-            if(matchedUser){
-                profileResponse = {
-                username: matchedUser.username,
-                realName: matchedUser.profile.realName,
-                aboutMe: matchedUser.profile.aboutMe,
-                ranking: matchedUser.profile.ranking,
-                reputation: matchedUser.profile.reputation,
-                skillTags: matchedUser.profile.skillTags,
-                badges: matchedUser.badges.map((badge: any) => ({
-                    id: badge.id,
-                    name: badge.displayName,
-                    icon: badge.icon,
-                })),
-                submissionStats: matchedUser.submitStats?.acSubmissionNum || [],
-                languageStats: matchedUser.languageProblemCount || [],
-                };
-            }
-            else {
-                errors.profile = "Leetcode user not found";
-            }
+    }
+ 
+    const [profileRes, contestRes, initialCalendarRes] = await Promise.allSettled([
+        axios.post('https://leetcode.com/graphql', { query: profileQuery, variables: { leetcode_username } }, { headers }),
+        axios.post('https://leetcode.com/graphql', { query: contestQuery, variables: { leetcode_username } }, { headers }),
+        axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year: new Date().getFullYear() } }, { headers })
+    ]);
+    let profileResponse: LeetCodeProfileInterface | null = null
+    let contestResponse: LeetCodeContestInterface | null = null
+    let submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null> = {}
+    let errors: LeetCodeErrorInterface = {
+        profile: undefined,
+        contest: undefined,
+        calendar: undefined
+    }
+    if(profileRes.status === 'fulfilled'){
+        const matchedUser = profileRes.value.data.data?.matchedUser;
+        if(matchedUser){
+            profileResponse = {
+            username: matchedUser.username,
+            realName: matchedUser.profile.realName,
+            aboutMe: matchedUser.profile.aboutMe,
+            ranking: matchedUser.profile.ranking,
+            reputation: matchedUser.profile.reputation,
+            skillTags: matchedUser.profile.skillTags,
+            badges: matchedUser.badges.map((badge: any) => ({
+                id: badge.id,
+                name: badge.displayName,
+                icon: badge.icon,
+            })),
+            submissionStats: matchedUser.submitStats?.acSubmissionNum || [],
+            languageStats: matchedUser.languageProblemCount || [],
+            };
         }
         else {
-            errors.profile = profileRes.reason?.message || 'Failed to fetch profile';
+            errors.profile = "Leetcode user not found";
         }
-
-        if(contestRes.status === 'fulfilled'){
-            const contest = contestRes.value.data.data?.userContestRanking;
-            contestResponse = {
-                totalContestAttended: contest?.attendedContestsCount ?? null,
-                rating: contest?.rating ?? null,
-                globalRanking: contest?.globalRanking ?? null,
-                totalParticipants: contest?.totalParticipants ?? null,
-                topPercentage: contest?.topPercentage ?? null
-            }
+    }
+    else {
+        errors.profile = profileRes.reason?.message || 'Failed to fetch profile';
+    }
+    if(contestRes.status === 'fulfilled'){
+        const contest = contestRes.value.data.data?.userContestRanking;
+        contestResponse = {
+            totalContestAttended: contest?.attendedContestsCount ?? null,
+            rating: contest?.rating ?? null,
+            globalRanking: contest?.globalRanking ?? null,
+            totalParticipants: contest?.totalParticipants ?? null,
+            topPercentage: contest?.topPercentage ?? null
         }
-        else {
-            errors.contest = contestRes.reason?.message || 'Failed to fetch contest';
-        }
-
-        if(initialCalendarRes.status === 'fulfilled'){
-            let initialCalendarResponse = initialCalendarRes.value.data.data?.matchedUser?.userCalendar;
-            const activeYears: number[] = (initialCalendarResponse.activeYears || []).sort((a: any, b: any) => b - a);
-            const selectedYear = activeYears.slice(0, 5);
-            //Map for past 5 active years
-            const calendarPromises = selectedYear.map((year: number) => 
-                axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year } }, { headers })
-            )
-            const calendarResults = await Promise.allSettled(calendarPromises);
-            calendarResults.forEach((res, index) => {
-                const year = selectedYear[index];
-                if(res.status === 'fulfilled'){
-                    const calendar = res.value.data.data?.matchedUser?.userCalendar;
-                    if(calendar){
-                        submissionCalendarResponse[year] = {
-                            submissionCalendar: calendar.submissionCalendar || {},
-                            streak: calendar.streak || 0,
-                            totalActiveDays: calendar.totalActiveDays || 0,
-                            activeYears: calendar.activeYears || []
-                        };
-                    } 
+    }
+    else {
+        errors.contest = contestRes.reason?.message || 'Failed to fetch contest';
+    }
+    if(initialCalendarRes.status === 'fulfilled'){
+        let initialCalendarResponse = initialCalendarRes.value.data.data?.matchedUser?.userCalendar;
+        const activeYears: number[] = (initialCalendarResponse.activeYears || []).sort((a: any, b: any) => b - a);
+        const selectedYear = activeYears.slice(0, 5);
+        //Map for past 5 active years
+        const calendarPromises = selectedYear.map((year: number) => 
+            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year } }, { headers })
+        )
+        const calendarResults = await Promise.allSettled(calendarPromises);
+        calendarResults.forEach((res, index) => {
+            const year = selectedYear[index];
+            if(res.status === 'fulfilled'){
+                const calendar = res.value.data.data?.matchedUser?.userCalendar;
+                if(calendar){
+                    submissionCalendarResponse[year] = {
+                        submissionCalendar: calendar.submissionCalendar || {},
+                        streak: calendar.streak || 0,
+                        totalActiveDays: calendar.totalActiveDays || 0,
+                        activeYears: calendar.activeYears || []
+                    };
                 } 
-                else {
-                    submissionCalendarResponse[year] = null;
-                    if(!errors.calendar) errors.calendar = res.reason?.message || `Failed to fetch calendar for ${year}`;
-                }
-            });
-        }
-        else {
-            errors.calendar = initialCalendarRes.reason?.message || 'Failed to fetch calendar';
-        }
+            } 
+            else {
+                submissionCalendarResponse[year] = null;
+                if(!errors.calendar) errors.calendar = res.reason?.message || `Failed to fetch calendar for ${year}`;
+            }
+        });
+    }
+    else {
+        errors.calendar = initialCalendarRes.reason?.message || 'Failed to fetch calendar';
+    }
     return { profileResponse, contestResponse, submissionCalendarResponse, errors }
-} 
+}
 
 const getCachedLeetcodeData = (leetcode_username: string) => unstable_cache(() => 
     fetchLeetcodeData(leetcode_username), [`leetcode-${leetcode_username}`], {

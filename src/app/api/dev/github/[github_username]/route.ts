@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import axios from 'axios'
-import type { GitHubDataInterface, GitHubProfileInterface, GitHubRepoInterface } from '@/interfaces/dev/github/githubInterface'
+import type { GitHubDataInterface, GithubErrorInterface, GitHubProfileInterface, GitHubRepoInterface } from '@/interfaces/dev/github/githubInterface'
 import { unstable_cache } from 'next/cache'
 
 const extractedRepos = (repo: any): GitHubRepoInterface => ({
@@ -122,7 +122,7 @@ const fetchGitHubData = async(github_username: string): Promise<GitHubDataInterf
     let pinnedRepos: GitHubRepoInterface[] = (user.pinnedItems?.nodes || []).map(extractedRepos)
     let recentRepos: GitHubRepoInterface[] = (user.recentRepositories?.nodes || []).map(extractedRepos)
     const reposMap = new Map<string, GitHubRepoInterface>()
-    let errors = {
+    let errors: GithubErrorInterface = {
         profile: undefined,
         calendar: undefined
     }
