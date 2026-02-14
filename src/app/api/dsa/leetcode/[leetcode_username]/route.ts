@@ -1,44 +1,106 @@
-import { CodeForcesContestInterface, CodeForcesErrorInterface, CodeForcesProfileInterface, ProblemBreakdownInterface } from "@/interfaces/dsa/codeforces/codeforcesInterface";
-import axios from "axios";
-import { NextRequest } from "next/server";
+import type { LeetCodeCalendarInterface, LeetCodeContestInterface, LeetCodeDataInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from '@/interfaces/dsa/leetcode/leetcodeInterface';
+import axios from 'axios'
+import { unstable_cache } from 'next/cache';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ codeforces_username: string }> }) {
-    const { codeforces_username } = await params
-
-    if(!codeforces_username){
-        return Response.json({ error: "Codeforces username is required" }, { status: 400 });
-    }
-
-    try {
-        const headers = {
-            "User-Agent": "Mozilla/5.0",
-        }
-        const [profileRes, contestRes, problemBreakdownRes] = await Promise.allSettled([
-            axios.get(`https://codeforces.com/api/user.info?handles=${codeforces_username}`, { headers }),
-            axios.get(`https://codeforces.com/api/user.rating?handle=${codeforces_username}`, { headers }),
-            axios.get(`https://codeforces.com/api/user.status?handle=${codeforces_username}`, { headers })
-        ])
-        let profileResponse: CodeForcesProfileInterface | null = null
-        let contestResponse: CodeForcesContestInterface | null = null
-        let problemBreakdownResponse: ProblemBreakdownInterface[] | null = null
-        let errors: CodeForcesErrorInterface = {
-            profile: undefined,
-            contest: undefined,
-            problemBreakdown: undefined
-        }
-        
-        let profileData: any = null;
-        if(profileRes.status === 'fulfilled'){
-            profileData = profileRes.value.data.result[0];
-            if(profileData){
-                profileResponse = {
-                    username: profileData.handle,
-                    currRank: profileData.rank,
-                    maxRank: profileData.maxRank
+const profileQuery = `
+    query getUserProfile($leetcode_username: String!){
+        matchedUser(username: $leetcode_username){
+            username
+            profile {
+                realName
+                aboutMe
+                starRating
+                ranking
+                reputation
+                skillTags
+            }
+            submitStats {
+                acSubmissionNum {
+                    difficulty
+                    count
+                    submissions
                 }
             }
+            badges {
+                id
+                displayName
+                icon
+            }
+            languageProblemCount{
+                languageName
+                problemsSolved
+            }
+        }
+    }
+    `
+
+    const contestQuery = `
+        query userContestRankingInfo($leetcode_username: String!) {
+            userContestRanking(username: $leetcode_username) {
+                attendedContestsCount
+                rating
+                globalRanking
+                totalParticipants
+                topPercentage
+            }
+        }
+    `;
+
+    const calendarQuery = `
+        query userProfileCalendar($username: String!, $year: Int) {
+            matchedUser(username: $username) {
+                userCalendar(year: $year) {
+                    activeYears
+                    streak
+                    totalActiveDays
+                    submissionCalendar
+                }
+            }
+        }
+    `
+
+const fetchLeetcodeData = async(leetcode_username: string): Promise<LeetCodeDataInterface> => {
+    const headers = {
+            'Content-Type': 'application/json',
+            Referer: `https://leetcode.com/${leetcode_username}/`,
+        }
+        const [profileRes, contestRes, initialCalendarRes] = await Promise.allSettled([
+            axios.post('https://leetcode.com/graphql', { query: profileQuery, variables: { leetcode_username } }, { headers }),
+            axios.post('https://leetcode.com/graphql', { query: contestQuery, variables: { leetcode_username } }, { headers }),
+            axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year: new Date().getFullYear() } }, { headers })
+        ]);
+
+        let profileResponse: LeetCodeProfileInterface | null = null
+        let contestResponse: LeetCodeContestInterface | null = null
+        let submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null> = {}
+        let errors: LeetCodeErrorInterface = {
+            profile: undefined,
+            contest: undefined,
+            calendar: undefined
+        }
+
+        if(profileRes.status === 'fulfilled'){
+            const matchedUser = profileRes.value.data.data?.matchedUser;
+            if(matchedUser){
+                profileResponse = {
+                username: matchedUser.username,
+                realName: matchedUser.profile.realName,
+                aboutMe: matchedUser.profile.aboutMe,
+                ranking: matchedUser.profile.ranking,
+                reputation: matchedUser.profile.reputation,
+                skillTags: matchedUser.profile.skillTags,
+                badges: matchedUser.badges.map((badge: any) => ({
+                    id: badge.id,
+                    name: badge.displayName,
+                    icon: badge.icon,
+                })),
+                submissionStats: matchedUser.submitStats?.acSubmissionNum || [],
+                languageStats: matchedUser.languageProblemCount || [],
+                };
+            }
             else {
-                errors.profile = "Codeforces user not found";
+                errors.profile = "Leetcode user not found";
             }
         }
         else {
@@ -46,74 +108,72 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
         }
 
         if(contestRes.status === 'fulfilled'){
-            const contestData = contestRes.value.data.result;
-            if(contestData){
-                contestResponse = {
-                    currRating: profileData.rating,
-                    maxRating: profileData.maxRating,
-                    contestHistory: contestData.map((contest: any) => ({
-                        contestId: contest.contestId,
-                        contestName: contest.contestName,
-                        contestRank: contest.rank,
-                        contestRating: contest.newRating,
-                        contestTime: contest.ratingUpdateTimeSeconds
-                    })),
-                    totalContestAttended: contestData.length
-                }
-            }
-            else {
-                errors.contest = "Codeforces contest not found";
+            const contest = contestRes.value.data.data?.userContestRanking;
+            contestResponse = {
+                totalContestAttended: contest?.attendedContestsCount ?? null,
+                rating: contest?.rating ?? null,
+                globalRanking: contest?.globalRanking ?? null,
+                totalParticipants: contest?.totalParticipants ?? null,
+                topPercentage: contest?.topPercentage ?? null
             }
         }
         else {
             errors.contest = contestRes.reason?.message || 'Failed to fetch contest';
         }
 
-
-        if(problemBreakdownRes.status === "fulfilled"){
-            const problemBreakdownData = problemBreakdownRes.value.data.result
-            if(problemBreakdownData){
-                //To get only accepted solutions
-                const accepted = problemBreakdownData.filter((soln: any) => soln.verdict === "OK")
-                let uniqueProblemsMap = new Map<string, any>()
-                //Deduplication, so used map
-                for(const soln of accepted){
-                    if(!soln.problem?.contestId || !soln.problem?.index) continue;
-                    const key = `${soln.problem.contestId}-${soln.problem.index}`
-                    if(!uniqueProblemsMap.has(key)) uniqueProblemsMap.set(key, soln.problem)
+        if(initialCalendarRes.status === 'fulfilled'){
+            let initialCalendarResponse = initialCalendarRes.value.data.data?.matchedUser?.userCalendar;
+            const activeYears: number[] = (initialCalendarResponse.activeYears || []).sort((a: any, b: any) => b - a);
+            const selectedYear = activeYears.slice(0, 5);
+            //Map for past 5 active years
+            const calendarPromises = selectedYear.map((year: number) => 
+                axios.post('https://leetcode.com/graphql', { query: calendarQuery, variables: { username: leetcode_username, year } }, { headers })
+            )
+            const calendarResults = await Promise.allSettled(calendarPromises);
+            calendarResults.forEach((res, index) => {
+                const year = selectedYear[index];
+                if(res.status === 'fulfilled'){
+                    const calendar = res.value.data.data?.matchedUser?.userCalendar;
+                    if(calendar){
+                        submissionCalendarResponse[year] = {
+                            submissionCalendar: calendar.submissionCalendar || {},
+                            streak: calendar.streak || 0,
+                            totalActiveDays: calendar.totalActiveDays || 0,
+                            activeYears: calendar.activeYears || []
+                        };
+                    } 
+                } 
+                else {
+                    submissionCalendarResponse[year] = null;
+                    if(!errors.calendar) errors.calendar = res.reason?.message || `Failed to fetch calendar for ${year}`;
                 }
-                const ratingFreqMap = new Map<number, number>()
-                let solved = 0;
-                for(const problem of uniqueProblemsMap.values()){
-                    //Only rated
-                    if(typeof problem.rating !== "number") continue;
-                    solved++;
-                    ratingFreqMap.set(problem.rating, (ratingFreqMap.get(problem.rating) || 0) + 1)
-                }
-                let problemBreakdown = Array.from(ratingFreqMap.entries()).map(([rating, count]) => ({
-                    rating,
-                    count
-                })).sort((a, b) => a.rating - b.rating)
-                let threshold = [1400, 1600, 1800, 2000]
-                problemBreakdownResponse = threshold.map(t => {
-                    let count = problemBreakdown.filter(p => p.rating >= t).reduce((sum, t) => sum + t.count, 0)
-                    return {
-                        rating: t, 
-                        count, 
-                        percentage: solved > 0 ? Math.round((count / solved) * 100) : 0
-                    }
-                })
-            }
-            else {
-                errors.problemBreakdown = "Codeforces problem breakdown not found";
-            }
+            });
         }
         else {
-            errors.problemBreakdown = problemBreakdownRes.reason?.message || 'Failed to fetch problem breakdown';
+            errors.calendar = initialCalendarRes.reason?.message || 'Failed to fetch calendar';
         }
-        return Response.json({ profileResponse, contestResponse, problemBreakdownResponse, errors }, { status: 200 })
+    return { profileResponse, contestResponse, submissionCalendarResponse, errors }
+} 
+
+const getCachedLeetcodeData = (leetcode_username: string) => unstable_cache(() => 
+    fetchLeetcodeData(leetcode_username), [`leetcode-${leetcode_username}`], {
+        revalidate: 3600,
+        tags: [`leetcode-${leetcode_username}`]
     }
+)
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ leetcode_username: string }> }) {
+    const { leetcode_username } = await params;
+
+    if(!leetcode_username){
+        return NextResponse.json({ error: "Username is required" }, { status: 400 });
+    }
+
+    try {
+        const { profileResponse, contestResponse, submissionCalendarResponse, errors } = await getCachedLeetcodeData(leetcode_username)()
+        return NextResponse.json({ profileResponse, contestResponse, submissionCalendarResponse, errors }, { status: 200 })
+    } 
     catch(err: any){
-        return Response.json({ error: "Failed to fetch Leetcode profile data" }, { status: 500 })
+        return NextResponse.json({ error: "Failed to fetch Leetcode data" }, { status: 500 })
     }
-}
+} 

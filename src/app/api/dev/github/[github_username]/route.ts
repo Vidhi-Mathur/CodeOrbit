@@ -99,83 +99,84 @@ const calendarQuery = `
 
 const fetchGitHubData = async(github_username: string): Promise<GitHubDataInterface> => {
     const token = process.env.GITHUB_AUTH_KEY!
-        const headers = { Authorization: `Bearer ${token}` }
+    const headers = { Authorization: `Bearer ${token}` }
 
-        //Fetch profile and repos
-        const profileRes = await axios.post('https://api.github.com/graphql', { query: profileQuery, variables: { github_username }}, { headers })
+    //Fetch profile and repos
+    const profileRes = await axios.post('https://api.github.com/graphql', { query: profileQuery, variables: { github_username }}, { headers })
+    const user = profileRes.data?.data?.user
+    
+    if(!user){
+        throw new Error("GitHub user not found")
+    }
 
-        const user = profileRes.data?.data?.user
-        
-        if(!user) throw new Error("GitHub user not found")
+    const profileResponse: GitHubProfileInterface = {
+        name: user.name,
+        login: user.login,
+        bio: user.bio,
+        location: user.location,
+        company: user.company,
+        createdAt: user.createdAt,
+        followers: user.followers?.totalCount,
+        publicRepos: user.repositoriesCount?.totalCount
+    }
+    let pinnedRepos: GitHubRepoInterface[] = (user.pinnedItems?.nodes || []).map(extractedRepos)
+    let recentRepos: GitHubRepoInterface[] = (user.recentRepositories?.nodes || []).map(extractedRepos)
+    const reposMap = new Map<string, GitHubRepoInterface>()
+    let errors = {
+        profile: undefined,
+        calendar: undefined
+    }
+    
+    pinnedRepos.forEach((repo: any) => (
+        reposMap.set(repo.name, repo)
+    ))
+    for(let repo of recentRepos){
+        if(reposMap.size >= 6) break
+        //Avoid duplicates
+        if(!reposMap.has(repo.name)) reposMap.set(repo.name, repo)
+    }
+    const reposResponse = Array.from(reposMap.values()).slice(0, 6)
 
-        const profileResponse: GitHubProfileInterface = {
-            name: user.name,
-            login: user.login,
-            bio: user.bio,
-            location: user.location,
-            company: user.company,
-            createdAt: user.createdAt,
-            followers: user.followers?.totalCount,
-            publicRepos: user.repositoriesCount?.totalCount
-        }
-
-        let pinnedRepos: GitHubRepoInterface[] = (user.pinnedItems?.nodes || []).map(extractedRepos)
-        let recentRepos: GitHubRepoInterface[] = (user.recentRepositories?.nodes || []).map(extractedRepos)
-
-        const reposMap = new Map<string, GitHubRepoInterface>()
-        pinnedRepos.forEach((repo: any) => (
-            reposMap.set(repo.name, repo)
-        ))
-
-        for(let repo of recentRepos){
-            if(reposMap.size >= 6) break
-            //Avoid duplicates
-            if(!reposMap.has(repo.name)) reposMap.set(repo.name, repo)
-        }
-
-        const reposResponse = Array.from(reposMap.values()).slice(0, 6)
-
-        //Determine active years (based on createdAt)
-        const createdYear = new Date(user.createdAt).getFullYear()
-        const currentYear = new Date().getFullYear()
-        const activeYears: number[] = []
-        for(let y = currentYear; y >= createdYear && activeYears.length < 5; y--){
-            activeYears.push(y)
-        }
-
-        //Fetch contribution calendars per year
-        const calendarPromises = activeYears.map((year) => {
-            const now = new Date()
-            const from = `${year}-01-01T00:00:00Z`
-            //only up to today if current year
-            const to = year === now.getFullYear()? now.toISOString(): `${year}-12-31T23:59:59Z`
-            return axios.post('https://api.github.com/graphql', { query: calendarQuery, variables: { github_username, from, to}}, { headers })})
-
-        const calendarResults = await Promise.all(calendarPromises)
-
-        const calendarMap: Record<number, { totalContributions: number, weeks: any[] }> = {}
-
-        calendarResults.forEach((res, index) => {
+    //Determine active years (based on createdAt)
+    const createdYear = new Date(user.createdAt).getFullYear()
+    const currentYear = new Date().getFullYear()
+    const activeYears: number[] = []
+    for(let y = currentYear; y >= createdYear && activeYears.length < 5; y--){
+        activeYears.push(y)
+    }
+    //Fetch contribution calendars per year
+    const calendarPromises = activeYears.map((year) => {
+        const now = new Date()
+        const from = `${year}-01-01T00:00:00Z`
+        //only up to today if current year
+        const to = year === now.getFullYear()? now.toISOString(): `${year}-12-31T23:59:59Z`
+        return axios.post('https://api.github.com/graphql', { query: calendarQuery, variables: { github_username, from, to}}, { headers })})
+    const calendarResults = await Promise.allSettled(calendarPromises)
+    const calendarMap: Record<number, { totalContributions: number, weeks: any[] }> = {}
+    calendarResults.forEach((res, index) => {
+        if(res.status === 'fulfilled'){
             const year = activeYears[index]
-            const cal = res.data?.data?.user?.contributionsCollection?.contributionCalendar
+            const cal = res.value.data?.data?.user?.contributionsCollection?.contributionCalendar
             calendarMap[year] = {
                 totalContributions: cal?.totalContributions || 0,
                 weeks: cal?.weeks || []
             }
-        })
-
-        const calendarResponse = {
-            activeYears: [...activeYears].sort((a, b) => a - b),
-            contributionCalendarResponse: calendarMap,
         }
-        return { profileResponse, reposResponse, calendarResponse }
+        else errors.calendar = res.reason?.message || `Failed to fetch calendar for ${activeYears[index]}`
+    })
+    const calendarResponse = {
+        activeYears: [...activeYears].sort((a, b) => a - b),
+        contributionCalendarResponse: calendarMap,
+    }
+    return { profileResponse, reposResponse, calendarResponse, errors }
 }
 
 const getCachedGithubData = (github_username: string) => unstable_cache(() => 
     fetchGitHubData(github_username), [`github-${github_username}`], {
         revalidate:  3600,
         tags: [`github-${github_username}`]
-    })
+    }
+)
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ github_username: string }> }) {
     const { github_username } = await params
@@ -186,8 +187,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ gith
 
     try {
         //() as unstable_cache returns function, so call it first to get data
-        const { profileResponse, reposResponse, calendarResponse } = await getCachedGithubData(github_username)()
-        return Response.json({ profileResponse, reposResponse, calendarResponse }, { status: 200 })
+        const { profileResponse, reposResponse, calendarResponse, errors } = await getCachedGithubData(github_username)()
+        return Response.json({ profileResponse, reposResponse, calendarResponse, errors }, { status: 200 })
     } 
     catch(err: any){
         return Response.json({ error: "Failed to fetch GitHub data" }, { status: 500 })

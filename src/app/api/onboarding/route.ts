@@ -10,8 +10,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
     await connectToDB()
-    const body = await req.json()
-    const { basicDetails, education, social, development, codingProfiles } = body
+    const { basicDetails, education, social, development, codingProfiles } = await req.json()
     try {
         //Initial validation
         if(!basicDetails?.username || !education?.degree || !education?.college || !education?.gradYear || !education?.location || !education?.currentProfile || !codingProfiles?.leetcode || !development?.github || !social?.linkedin){

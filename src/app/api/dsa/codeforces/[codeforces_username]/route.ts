@@ -1,16 +1,11 @@
-import { CodeForcesContestInterface, CodeForcesErrorInterface, CodeForcesProfileInterface, ProblemBreakdownInterface } from "@/interfaces/dsa/codeforces/codeforcesInterface";
+import { CodeForcesContestInterface, CodeForcesDataInterface, CodeForcesErrorInterface, CodeForcesProfileInterface, ProblemBreakdownInterface } from "@/interfaces/dsa/codeforces/codeforcesInterface";
 import axios from "axios";
+import { unstable_cache } from "next/cache";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ codeforces_username: string }> }) {
-    const { codeforces_username } = await params
 
-    if(!codeforces_username){
-        return Response.json({ error: "Codeforces username is required" }, { status: 400 });
-    }
-
-    try {
-        const headers = {
+const fetchCodeForcesData = async(codeforces_username: string): Promise<CodeForcesDataInterface> => {
+    const headers = {
             "User-Agent": "Mozilla/5.0",
         }
         const [profileRes, contestRes, problemBreakdownRes] = await Promise.allSettled([
@@ -33,12 +28,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
             if(profileData){
                 profileResponse = {
                     username: profileData.handle,
-                    currRank: profileData.rank,
-                    maxRank: profileData.maxRank
+                    currRank: profileData.rank ?? null,
+                    maxRank: profileData.maxRank ?? null
                 }
             }
             else {
-                errors.profile = "Codeforces user not found";
+                errors.profile = "Codeforces profile not found";
             }
         }
         else {
@@ -49,8 +44,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
             const contestData = contestRes.value.data.result;
             if(contestData){
                 contestResponse = {
-                    currRating: profileData.rating,
-                    maxRating: profileData.maxRating,
+                    currRating: profileData.rating ?? null,
+                    maxRating: profileData.maxRating ?? null,
                     contestHistory: contestData.map((contest: any) => ({
                         contestId: contest.contestId,
                         contestName: contest.contestName,
@@ -111,6 +106,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
         else {
             errors.problemBreakdown = problemBreakdownRes.reason?.message || 'Failed to fetch problem breakdown';
         }
+        return { profileResponse, contestResponse, problemBreakdownResponse, errors }
+}
+
+
+const getCachedCodeForcesData = (codeforces_username: string) => unstable_cache(() => 
+    fetchCodeForcesData(codeforces_username), [`codeforces-${codeforces_username}`], {
+        revalidate:  3600,
+        tags: [`codeforces-${codeforces_username}`]
+    }
+)
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ codeforces_username: string }>}) {
+    const { codeforces_username } = await params
+
+    if(!codeforces_username){
+        return Response.json({ error: "Codeforces username is required" }, { status: 400 });
+    }
+
+    try {
+        const { profileResponse, contestResponse, problemBreakdownResponse, errors } = await getCachedCodeForcesData(codeforces_username)()
         return Response.json({ profileResponse, contestResponse, problemBreakdownResponse, errors }, { status: 200 })
     }
     catch(err: any){
