@@ -123,7 +123,8 @@ export const formatNumber = (num: number) => {
 }
 
 //Format rating to 2 decimal places
-export const formatRating = (rating: number) => {
+export const formatRating = (rating: number | null | undefined) => {
+    if(typeof rating !== "number") return 0
     return Math.round(rating).toString()
 }
 
