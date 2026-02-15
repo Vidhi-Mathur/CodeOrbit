@@ -1,44 +1,38 @@
-"use client"
-import { useEffect, useState } from "react"
 import DSAStats from "./DSAStats"
 import { ShimmerCalendar, ShimmerContest, ShimmerProfile } from "../ui/ShimmerUI"
 import type { SectionProps } from "@/interfaces/profileInterfaces"
-import { type DsaLink, type DevLink, dsaLinks } from "@/constants/profileConstant"
-import { useLeetCode } from "@/hooks/useLeetCode"
+import { type DsaLink, DSA_LINKS } from "@/constants/profileConstant"
+import { useLeetcodeQuery } from "@/hooks/useLeetCode"
 import { LeetCodeProfile } from "./leetcode/LeetCodeProfile"
 import { LeetCodeContest } from "./leetcode/LeetCodeContest"
 import { LeetCodeCalendar } from "./leetcode/LeetCodeCalendar"
-import { useCodeForces } from "@/hooks/useCodeForces"
 import { CodeForcesProfile } from "./codeforces/CodeForcesProfile"
 import { CodeForcesContest } from "./codeforces/CodeForcesContest"
 import { CodeForcesProblemBreakdown } from "./codeforces/CodeForcesProblemBreakdown"
+import { useCodeforcesQuery } from "@/hooks/useCodeForces"
 
-export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false, refresh }: SectionProps) => {
-    const { profile: leetcodeProfile, contest: leetcodeContest, calendar: leetcodeCalendar, loading: leetcodeLoading, errors: leetcodeErrors, fetchLeetCodeData } = useLeetCode(user.platforms.dsa.leetcode)
-    const { profile: codeforcesProfile, contest: codeforcesContest, problemBreakdown: codeforcesProblemBreakdown, loading: codeforcesLoading, errors: codeforcesErrors, fetchCodeForcesData } = useCodeForces(user.platforms.dsa.codeforces)
+export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
+    const isLeetcodeActive = activePlatform === DSA_LINKS.LEETCODE
+    const { data: leetcodeData, isLoading: leetcodeLoading, error: leetcodeNetworkError } = useLeetcodeQuery(isLeetcodeActive? user.platforms.dsa.leetcode: undefined)
+    const leetcodeProfile = leetcodeData?.profileResponse
+    const leetcodeContest = leetcodeData?.contestResponse
+    const leetcodeCalendar = leetcodeData?.submissionCalendarResponse
+    const leetcodeApiErrors = leetcodeData?.errors
 
-    const platformClickHandler = (platform: DsaLink | DevLink) => {
+    const isCodeforcesActive = activePlatform === DSA_LINKS.CODEFORCES
+    const { data: codeforcesData, isLoading: codeforcesLoading, error: codeforcesNetworkError } = useCodeforcesQuery(isCodeforcesActive? user.platforms.dsa.codeforces: undefined)
+    const codeforcesProfile = codeforcesData?.profileResponse
+    const codeforcesContest = codeforcesData?.contestResponse
+    const codeforcesProblemBreakdown = codeforcesData?.problemBreakdownResponse
+    const codeforcesApiErrors = codeforcesData?.errors
+
+    const platformClickHandler = (platform: DsaLink) => {
         onPlatformChange(platform)
     }
 
-    useEffect(() => {
-        if(dsaLinks.includes(activePlatform as DsaLink)){
-            switch(activePlatform as DsaLink){
-                case "leetcode":
-                    fetchLeetCodeData()
-                    break
-                case "codeforces":
-                    fetchCodeForcesData()
-                    break
-                default:
-                    console.log("Implement Handler")
-            }  
-        }
-    }, [activePlatform, refresh])
-
     //Render sidebar content only
     if(renderSidebarOnly){
-        if(activePlatform === "leetcode"){
+        if(activePlatform === DSA_LINKS.LEETCODE){
         return (
             <>
             {leetcodeLoading && (
@@ -49,9 +43,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             )}
             {!leetcodeLoading && (
                 <>
-                {leetcodeErrors.calendar? (
+                {leetcodeApiErrors?.calendar? (
                     <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base m-2">
-                        {leetcodeErrors.calendar}
+                        {leetcodeApiErrors?.calendar}
                     </div>
                     ): (
                     leetcodeCalendar && (
@@ -64,9 +58,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                             />
                     </div>
                 ))}
-                {leetcodeErrors.contest ? (
+                {leetcodeApiErrors?.contest ? (
                     <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base m-2">
-                        {leetcodeErrors.contest}
+                        {leetcodeApiErrors?.contest}
                     </div>
                     ): (
                     leetcodeContest && (
@@ -80,7 +74,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             </>
         )
     }
-    else if(activePlatform === "codeforces"){
+    else if(activePlatform === DSA_LINKS.CODEFORCES){
         return (
         <>
         {codeforcesLoading && (
@@ -90,9 +84,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
         )}
         {!codeforcesLoading && (
             <>
-            {codeforcesErrors.problemBreakdown? (
+            {codeforcesApiErrors?.problemBreakdown? (
                 <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base m-2">
-                    {codeforcesErrors.problemBreakdown}
+                    {codeforcesApiErrors?.problemBreakdown}
                 </div>
                 ): (
                 codeforcesProblemBreakdown && (
@@ -110,13 +104,13 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
   }
 
     const renderMainContent = () => {
-        if(activePlatform === "leetcode"){
+        if(activePlatform === DSA_LINKS.LEETCODE){
             return (
                 <>
                 {leetcodeLoading && <ShimmerProfile />}
-                {leetcodeErrors.profile? (
+                {leetcodeApiErrors?.profile? (
                     <div className="sm:-mt-15 lg:-mt-20 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
-                        {leetcodeErrors.profile}
+                        {leetcodeApiErrors?.profile}
                     </div>
                 ): (
                     leetcodeProfile && <LeetCodeProfile profile={leetcodeProfile} />
@@ -124,7 +118,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                 </>
             )
         }
-        else if(activePlatform === "codeforces"){
+        else if(activePlatform === DSA_LINKS.CODEFORCES){
             return (
                 <>
                 {codeforcesLoading && (
@@ -133,16 +127,16 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                 <ShimmerProfile />
                 </>
             )}
-                {codeforcesErrors.profile? (
+                {codeforcesApiErrors?.profile? (
                     <div className="sm:-mt-15 lg:-mt-20 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
-                        {codeforcesErrors.profile}
+                        {codeforcesApiErrors?.profile}
                     </div>
                 ): (
                     codeforcesProfile && <CodeForcesProfile profile={codeforcesProfile} />
                 )}
-                {codeforcesErrors.contest? (
+                {codeforcesApiErrors?.contest? (
                 <div className="bg-red-50 ml-2 sm:ml-3 lg:ml-12 mt-3 p-3 sm:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
-                    {codeforcesErrors.contest}
+                    {codeforcesApiErrors?.contest}
                 </div>
                 ): (
                 codeforcesContest && (
@@ -168,7 +162,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
 
     return (
         <>
-        <DSAStats onClick={platformClickHandler} activePlatform={activePlatform} />
+        <DSAStats onClick={platformClickHandler} activePlatform={activePlatform as DsaLink} />
         <div className="flex-1 m-3 sm:m-4 lg:m-6 lg:-mt-108">{renderMainContent()}</div>
         </>
     )

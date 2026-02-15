@@ -1,38 +1,13 @@
-"use client"
-import type { LeetCodeCalendarInterface, LeetCodeContestInterface, LeetCodeErrorInterface, LeetCodeProfileInterface } from "@/interfaces/dsa/leetcode/leetcodeInterface"
+import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { useState } from "react"
 
-export const useLeetCode = (leetcodeUsername: string) => {
-    const [profile, setProfile] = useState<LeetCodeProfileInterface | null>(null)
-    const [contest, setContest] = useState<LeetCodeContestInterface | null>(null);
-    const [calendar, setCalendar] = useState<LeetCodeCalendarInterface | null>(null)
-    const [loading, setLoading] = useState<boolean>(false)
-    const [errors, setErrors] = useState<LeetCodeErrorInterface>({});
-    const fetchLeetCodeData = async() => {
-        setLoading(true)
-        setErrors({})
-        setProfile(null)
-        setContest(null)
-        setCalendar(null)
-        try {
-            const response =  await axios.get(`/api/dsa/leetcode/${leetcodeUsername}`)
-            const { profileResponse, contestResponse, submissionCalendarResponse, errors } = response.data
-            setProfile(profileResponse)
-            setContest(contestResponse)
-            setCalendar(submissionCalendarResponse)
-            setErrors(errors || {});
-        } 
-        catch(err: any){
-            setErrors({
-                profile: err?.response?.data?.error || "Failed to load Leetcode profile",
-                contest: err?.response?.data?.error || "Failed to load Leetcode contest",
-                calendar: err?.response?.data?.error || "Failed to load Leetcode calendar"
-            }); 
-        } 
-        finally{
-            setLoading(false)
-        }
-    }
-    return { profile, contest, calendar, loading, errors, fetchLeetCodeData }
+export const useLeetcodeQuery = (leetcode_username: string | undefined) => {
+    return useQuery({
+        queryKey: ["leetcode", leetcode_username],
+        queryFn: async () => {
+            const response =  await axios.get(`/api/dsa/leetcode/${leetcode_username}`)
+            return response.data
+        },
+        enabled: !!leetcode_username,
+    })
 }
