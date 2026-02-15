@@ -1,38 +1,39 @@
-"use client"
-import { useEffect } from "react"
 import type { SectionProps } from "@/interfaces/profileInterfaces"
-import { type DsaLink, type DevLink, devLinks } from "@/constants/profileConstant"
-import { useGitHub } from "@/hooks/useGitHub"
+import { type DsaLink, type DevLink } from "@/constants/profileConstant"
+import { useGithubQuery } from "@/hooks/useGitHub"
 import DevStats from "@/components/dev/DevStats"
 import { GitHubProfile } from "@/components/dev/github/GitHubProfile"
 import { GitHubRepo } from "@/components/dev/github/GitHubRepo"
 import { ShimmerProfile, ShimmerRepo, ShimmerCalendar } from "@/components/ui/ShimmerUI"
 import { GitHubCalendar } from "./github/GitHubCalendar"
 
-export const DevSection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false, refresh }: SectionProps) => {
-    const { githubProfile, repos, loading: githubLoading, calendar, errors: githubError, fetchGitHubData } = useGitHub(user.platforms.dev.github)
+export const DevSection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
+    const isGithubActive = activePlatform === "github"
+    const { data, isLoading: githubLoading, error: githubNetworkError } = useGithubQuery(isGithubActive? user.platforms.dev.github: undefined)
+    const githubProfile = data?.profileResponse
+    const repos = data?.reposResponse
+    const calendar = data?.calendarResponse
+    const githubApiError = data?.errors
 
     const platformClickHandler = (platform: DsaLink | DevLink) => {
         onPlatformChange(platform)
     }
-    
-    useEffect(() => {
-        if(devLinks.includes(activePlatform as DevLink)){
-            switch(activePlatform as DevLink){
-                case "github":
-                    fetchGitHubData()
-                    break
-            }
-        }
-    }, [activePlatform, refresh])
+
+    if(githubNetworkError){
+        return (
+            <div className="bg-red-50 p-3 sm:p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
+                "Failed to fetch GitHub data. Please try again."
+            </div>
+        )
+    }
     
     if(renderSidebarOnly){
         return (
             <>
             {githubLoading && <ShimmerCalendar />}
-            {githubError.calendar? (
+            {githubApiError?.calendar ? (
                 <div className="bg-red-50 p-3 sm:p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
-                    {githubError.calendar || "Failed to load contribution calendar"}
+                    {githubApiError?.calendar || "Failed to load contribution calendar"}
                 </div>
             ): calendar && (
                 <div className="p-2 sm:p-3">
@@ -52,9 +53,9 @@ export const DevSection = ({ user, activePlatform, onPlatformChange, renderSideb
                     <ShimmerRepo />
                 </div>
             )}
-            {githubError.profile? (
+            {githubApiError?.profile? (
                 <div className="sm:-mt-15 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
-                    {githubError.profile || "Failed to load GitHub profile and repos"}
+                    {githubApiError?.profile || "Failed to load GitHub profile and repos"}
                 </div>
             ): (
             <div className="space-y-4">

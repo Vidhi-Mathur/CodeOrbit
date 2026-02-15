@@ -1,12 +1,15 @@
 "use client"
+import axios from "axios"
 import { useState } from "react"
 import type { ProfileComponentProps } from "@/interfaces/profileInterfaces"
 import { DsaLink, DevLink, PROFILE_TABS, ProfileTabs, dsaLinks, devLinks } from "@/constants/profileConstant"
 import { ProfileHeader } from "./ProfileHeader"
 import { DSASection } from "../dsa/DSASection"
 import { DevSection } from "../dev/DevSection"
+import { useQueryClient } from "@tanstack/react-query"
 
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
+    const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState<ProfileTabs>(PROFILE_TABS.PROBLEM_SOLVING)
     const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>("leetcode")
     const [refresh, setRefresh] = useState<number>(0)
@@ -39,14 +42,15 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
     }
 
     const refreshHandler = async() => {
-        await fetch(`/api/refresh`, { 
-            method: "POST" ,
-            body: JSON.stringify({
-                platform: activePlatform,
-                //TODO: Make it generic for all platforms
-                username: getUsername(activePlatform)
-            })
+        await axios.post(`/api/refresh`, { 
+            platform: activePlatform,
+            username: getUsername(activePlatform)
         })
+        if(activePlatform === "github"){
+            queryClient.invalidateQueries({
+                queryKey: ["github", getUsername(activePlatform)]
+            })
+        }
         setRefresh(prev => prev + 1)
     }
 
@@ -59,7 +63,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
                     <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} refresh={refresh} />
                 )}
                 {activeTab === PROFILE_TABS.DEVELOPMENT && (
-                    <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} refresh={refresh}/>
+                    <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} />
                 )}
                 <div className="block lg:hidden bg-cyan-200 mt-4">
                     <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
@@ -67,7 +71,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
                             <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh}/>
                         )}
                         {activeTab === PROFILE_TABS.DEVELOPMENT && (
-                            <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh} />
+                            <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
                         )}
                     </div>
                 </div>
@@ -78,7 +82,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
                 <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh}/>
             )}
             {activeTab === PROFILE_TABS.DEVELOPMENT && (
-                <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh} />
+                <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
             )}
         </div>
     </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { NavigationBar } from "@/components/ui/NavigationBar";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { QueryProvider } from "./providers";
 
 export const metadata: Metadata = {
   title: "CodeOrbit",
@@ -13,8 +14,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <AuthProvider>
-        <NavigationBar />
-        {children}
+            <NavigationBar />
+            <QueryProvider>
+                {children}
+            </QueryProvider>
         </AuthProvider>          
       </body>
     </html>
