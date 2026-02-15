@@ -2,7 +2,7 @@
 import axios from "axios"
 import { useState } from "react"
 import type { ProfileComponentProps } from "@/interfaces/profileInterfaces"
-import { DsaLink, DevLink, PROFILE_TABS, ProfileTabs, dsaLinks, devLinks } from "@/constants/profileConstant"
+import { DsaLink, DevLink, PROFILE_TABS, ProfileTabs, DSA_LINKS, DEV_LINKS } from "@/constants/profileConstant"
 import { ProfileHeader } from "./ProfileHeader"
 import { DSASection } from "../dsa/DSASection"
 import { DevSection } from "../dev/DevSection"
@@ -11,12 +11,11 @@ import { useQueryClient } from "@tanstack/react-query"
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
     const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState<ProfileTabs>(PROFILE_TABS.PROBLEM_SOLVING)
-    const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>("leetcode")
-    const [refresh, setRefresh] = useState<number>(0)
+    const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>(DSA_LINKS.LEETCODE)
 
     const getUsername = (platform: DsaLink | DevLink): string | undefined => {
-        if(dsaLinks.includes(platform as DsaLink)) return user.platforms.dsa?.[platform as keyof typeof user.platforms.dsa]
-        else if(devLinks.includes(platform as DevLink)) return user.platforms.dev?.[platform as keyof typeof user.platforms.dev]
+        if(Object.values(DSA_LINKS).includes(platform as DsaLink)) return user.platforms.dsa?.[platform as keyof typeof user.platforms.dsa]
+        else if(Object.values(DEV_LINKS).includes(platform as DevLink)) return user.platforms.dev?.[platform as keyof typeof user.platforms.dev]
         return undefined
     }
 
@@ -24,14 +23,14 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
         setActiveTab(tab)
         if(tab === PROFILE_TABS.PROBLEM_SOLVING){
             //If current platform is not a CP platform, set default to leetcode
-            if(!dsaLinks.includes(activePlatform as DsaLink)){
-                setActivePlatform("leetcode")
+            if(!Object.values(DSA_LINKS).includes(activePlatform as DsaLink)){
+                setActivePlatform(DSA_LINKS.LEETCODE)
             }
         } 
         else if(tab === PROFILE_TABS.DEVELOPMENT){
             //If current platform is not a Dev platform, set default to github
-            if(!devLinks.includes(activePlatform as DevLink)){
-                setActivePlatform("github")
+            if(!Object.values(DEV_LINKS).includes(activePlatform as DevLink)){
+                setActivePlatform(DEV_LINKS.GITHUB)
             }
         }
     }
@@ -42,16 +41,14 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
     }
 
     const refreshHandler = async() => {
+        const username = getUsername(activePlatform)
         await axios.post(`/api/refresh`, { 
             platform: activePlatform,
-            username: getUsername(activePlatform)
+            username: username
         })
-        if(activePlatform === "github"){
-            queryClient.invalidateQueries({
-                queryKey: ["github", getUsername(activePlatform)]
-            })
-        }
-        setRefresh(prev => prev + 1)
+        queryClient.invalidateQueries({
+            queryKey: [activePlatform, username]
+        })
     }
 
     return (
@@ -60,7 +57,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
             <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} onRefresh={refreshHandler} />
             <div className="bg-blue-200 flex-1 lg:h-[calc(3/4*100vh)] overflow-y-auto scrollbar-hide">
                 {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
-                    <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} refresh={refresh} />
+                    <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} />
                 )}
                 {activeTab === PROFILE_TABS.DEVELOPMENT && (
                     <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} />
@@ -68,7 +65,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
                 <div className="block lg:hidden bg-cyan-200 mt-4">
                     <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
                         {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
-                            <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh}/>
+                            <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
                         )}
                         {activeTab === PROFILE_TABS.DEVELOPMENT && (
                             <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
@@ -79,7 +76,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
         </div>
         <div className="hidden lg:block lg:w-1/4 bg-cyan-200 pt-[80px] overflow-y-auto h-screen scrollbar-hide">
             {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
-                <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} refresh={refresh}/>
+                <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
             )}
             {activeTab === PROFILE_TABS.DEVELOPMENT && (
                 <DevSection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} renderSidebarOnly={true} />
