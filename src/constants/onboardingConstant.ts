@@ -1,5 +1,6 @@
 import type { BasicDetailsInterface, FieldConfig, FormDataInterface } from "@/interfaces/onboardingInterface"
 import { CodingProfilesInterface, DevelopmentInterface, EducationInterface, InfoInterface } from "@/interfaces/profileInterfaces"
+import { DEV_LINKS, DSA_LINKS } from "./profileConstant"
 
 export const totalSteps: number = 5
 
@@ -53,37 +54,37 @@ export const socialFields: FieldConfig<InfoInterface>[] = [{
 ]
 
 export const developmentFields: FieldConfig<DevelopmentInterface>[] = [{
-    id: "github",
+    id: DEV_LINKS.GITHUB,
     label: "GitHub",
     placeholder: "Your GitHub Username (no url)"
 }]
 
 export const codingProfilesFields: FieldConfig<CodingProfilesInterface>[] = [{
-        id: "leetcode",
+        id: DSA_LINKS.LEETCODE,
         label: "LeetCode Profile",
         placeholder: "Your LeetCode Username (no url)"
     }, {
-        id: "geeksforgeeks",
+        id: DSA_LINKS.GEEKSFORGEEKS,
         label: "GeeksForGeeks Profile",
         placeholder: "Your GeeksForGeeks Username"
     }, {
-        id: "codeforces",
+        id: DSA_LINKS.CODEFORCES,
         label: "CodeForces Profile",
         placeholder: "Your CodeForces Username"
     }, {
-        id: "codechef",
+        id: DSA_LINKS.CODECHEF,
         label: "CodeChef Profile",
         placeholder: "Your CodeChef Username"
     }, {
-        id: "hackerrank",
+        id: DSA_LINKS.HACKERRANK,
         label: "HackerRank Profile",
         placeholder: "Your HackerRank Username"
     }, {
-        id: "interviewbit",
+        id: DSA_LINKS.INTERVIEWBIT,
         label: "InterviewBit Profile",
         placeholder: "Your InterviewBit Username"
     }, {
-        id: "codingninjas",
+        id: DSA_LINKS.CODINGNINJAS,
         label: "CodingNinjas Profile",
         placeholder: "Your CodingNinjas Username"
     }

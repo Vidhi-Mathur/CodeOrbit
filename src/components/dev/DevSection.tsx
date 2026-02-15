@@ -1,5 +1,5 @@
 import type { SectionProps } from "@/interfaces/profileInterfaces"
-import { type DsaLink, type DevLink } from "@/constants/profileConstant"
+import { DevLink, DEV_LINKS } from "@/constants/profileConstant"
 import { useGithubQuery } from "@/hooks/useGitHub"
 import DevStats from "@/components/dev/DevStats"
 import { GitHubProfile } from "@/components/dev/github/GitHubProfile"
@@ -8,14 +8,14 @@ import { ShimmerProfile, ShimmerRepo, ShimmerCalendar } from "@/components/ui/Sh
 import { GitHubCalendar } from "./github/GitHubCalendar"
 
 export const DevSection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
-    const isGithubActive = activePlatform === "github"
+    const isGithubActive = activePlatform === DEV_LINKS.GITHUB
     const { data, isLoading: githubLoading, error: githubNetworkError } = useGithubQuery(isGithubActive? user.platforms.dev.github: undefined)
     const githubProfile = data?.profileResponse
     const repos = data?.reposResponse
     const calendar = data?.calendarResponse
     const githubApiError = data?.errors
 
-    const platformClickHandler = (platform: DsaLink | DevLink) => {
+    const platformClickHandler = (platform: DevLink) => {
         onPlatformChange(platform)
     }
 
@@ -69,7 +69,7 @@ export const DevSection = ({ user, activePlatform, onPlatformChange, renderSideb
 
     return (
         <>
-        <DevStats onClick={platformClickHandler} activePlatform={activePlatform} />
+        <DevStats onClick={platformClickHandler} activePlatform={activePlatform as DevLink} />
         <div className="flex-1 m-3 sm:m-4 lg:m-6 lg:-mt-13">{renderMainContent()}</div>
         </>
     )
