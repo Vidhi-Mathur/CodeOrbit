@@ -87,10 +87,10 @@ export const GitHubCalendar = ({ contributions }: GitHubCalendarProps) => {
         </div>
         {allYears.length > 1 && (
             <div className="mb-3 sm:mb-3 md:mb-3 lg:mb-4 px-2 sm:px-3 md:px-3 lg:px-4 m-1 sm:m-1.5 md:m-0 lg:m-2">
-                <label className="block text-xs sm:text-sm md:text-sm lg:text-sm font-semibold text-gray-700 mb-1 sm:mb-2 md:mb-2 lg:mb-2">
+                <label htmlFor="github-year" className="block text-xs sm:text-sm md:text-sm lg:text-sm font-semibold text-gray-700 mb-1 sm:mb-2 md:mb-2 lg:mb-2">
                     Year
                 </label>
-                <select className="border-2 border-gray-200 rounded-lg px-2 sm:px-3 md:px-3 lg:px-3 py-1.5 sm:py-2 md:py-2 lg:py-2 text-gray-900 font-medium focus:border-blue-500 focus:outline-none transition-colors text-sm sm:text-base md:text-base lg:text-base" value={selectedYear} onChange={changeHandler}>
+                <select id="github-year" className="border-2 border-gray-200 rounded-lg px-2 sm:px-3 md:px-3 lg:px-3 py-1.5 sm:py-2 md:py-2 lg:py-2 text-gray-900 font-medium focus:border-blue-500 focus:outline-none transition-colors text-sm sm:text-base md:text-base lg:text-base" value={selectedYear} onChange={changeHandler}>
                     {allYears.map((year) => (
                         <option key={year} value={year} className="font-medium">
                             {year}
