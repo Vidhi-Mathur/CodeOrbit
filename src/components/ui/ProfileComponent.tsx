@@ -1,7 +1,7 @@
 "use client"
 import axios from "axios"
 import { useState } from "react"
-import type { ProfileComponentProps } from "@/interfaces/profileInterfaces"
+import type { ProfileComponentProps, RefreshInterface } from "@/interfaces/profileInterfaces"
 import { DsaLink, DevLink, PROFILE_TABS, ProfileTabs, DSA_LINKS, DEV_LINKS } from "@/constants/profileConstant"
 import { ProfileHeader } from "./ProfileHeader"
 import { DSASection } from "../dsa/DSASection"
@@ -12,6 +12,7 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
     const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState<ProfileTabs>(PROFILE_TABS.PROBLEM_SOLVING)
     const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>(DSA_LINKS.LEETCODE)
+    const [refreshState, setRefreshState] = useState<RefreshInterface>({ status: "idle" })
 
     const getUsername = (platform: DsaLink | DevLink): string | undefined => {
         if(Object.values(DSA_LINKS).includes(platform as DsaLink)) return user.platforms.dsa?.[platform as keyof typeof user.platforms.dsa]
@@ -42,19 +43,32 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
 
     const refreshHandler = async() => {
         const username = getUsername(activePlatform)
-        await axios.post(`/api/refresh`, { 
-            platform: activePlatform,
-            username: username
-        })
-        queryClient.invalidateQueries({
-            queryKey: [activePlatform, username]
-        })
+        try {
+            setRefreshState({ status: "loading" })
+            await axios.post(`/api/refresh`, {
+                platform: activePlatform,
+                username
+            })
+            queryClient.invalidateQueries({
+                queryKey: [activePlatform, username],
+            })
+          setRefreshState({ status: "success", message: "Updated" })
+        } 
+        catch(err: any){
+            const message = err?.response?.status === 429? "Rate limit exceeded": "Refresh failed"
+            setRefreshState({ status: "error", message })
+        } 
+        finally {
+            setTimeout(() => {
+                setRefreshState({ status: "idle" })
+            }, 2500)
+        }
     }
 
     return (
     <div className="flex flex-col lg:flex-row h-screen w-full overflow-y-auto scrollbar-hide">
         <div className="flex flex-col w-full lg:w-3/4">
-            <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} onRefresh={refreshHandler} />
+            <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} onRefresh={refreshHandler} refreshState={refreshState} />
             <div className="bg-blue-200 flex-1 lg:h-[calc(3/4*100vh)] overflow-y-auto scrollbar-hide">
                 {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
                     <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} />

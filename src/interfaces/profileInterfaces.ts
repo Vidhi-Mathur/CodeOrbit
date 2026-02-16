@@ -42,11 +42,17 @@ export interface ProfileComponentProps {
     }
 };
 
+export interface RefreshInterface {
+    status: "idle" | "loading" | "success" | "error"
+    message?: string
+}
+
 export interface ProfileHeaderProps {
     user: ProfileComponentProps["user"]
     activeTab: ProfileTabs
     onTabChange: (tab: ProfileTabs) => void
     onRefresh: () => void
+    refreshState: RefreshInterface
 }
 
 export interface EducationInterface {
