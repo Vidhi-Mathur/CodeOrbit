@@ -2,6 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import EditIcon from '@mui/icons-material/Edit';
@@ -9,6 +10,7 @@ import { signOut } from "next-auth/react"
 import { SideBarProps } from "@/interfaces/hompageInterface";
 
 export const SideBar = ({name, username, image}: SideBarProps) => {
+    const { data: session } = useSession()
     const [isOpen, setOpen] = useState<boolean>(false)
     const sidebarRef = useRef<HTMLDivElement>(null)
     const profileRef = useRef<HTMLDivElement>(null)
@@ -79,11 +81,11 @@ export const SideBar = ({name, username, image}: SideBarProps) => {
                     </div>
                 </div>
                 <div className="py-2">
-                    <Link href={username != 'To_Be_Onboarded'? `/profile/${username}` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
+                    <Link href={session?.user.isOnboarded? `/profile/${username}` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
                         <PersonIcon className="mr-2"/>
                         View your profile
                     </Link>
-                    <Link href={username != 'To_Be_Onboarded'? `/profile/${username}/edit` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
+                    <Link href={session?.user.isOnboarded? `/profile/edit` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
                         <EditIcon className="mr-2"/>
                         Edit your Profile
                     </Link>

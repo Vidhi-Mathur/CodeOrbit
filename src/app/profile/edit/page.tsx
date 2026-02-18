@@ -8,15 +8,21 @@ import Image from "next/image"
 import type { FormDataInterface } from "@/interfaces/onboardingInterface"
 import { basicDetailsFields, codingProfilesFields, developmentFields, educationFields, initialFormData,  socialFields, totalSteps } from "@/constants/onboardingConstant"
 import { LoadingSpinner } from "@/components/ui/ShimmerUI"
+import { useSession } from "next-auth/react"
 
 export default function EditPage(){
     const router = useRouter()
+    const { data: session } = useSession()
     const [currentStep, setCurrentStep] = useState<number>(1)
     const [formData, setFormData] = useState<FormDataInterface>(initialFormData)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
     const [isFetching, setIsFetching] = useState<boolean>(true)
+
+    useEffect(() => {
+        if(!session?.user.isOnboarded) router.replace("/onboarding")
+    }, [session])
 
     useEffect(() => {
         const fetchProfile = async() => {

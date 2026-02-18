@@ -13,7 +13,6 @@ export async function middleware(req: NextRequest) {
 
     //Not logged in and accessing protected route, redirect to login
     if(protectedRoutes.some(route => url.pathname.startsWith(route)) && !token){
-        console.log("Not logged in and accessing /onboarding, redirect to login")
         url.pathname = "/login";
         return NextResponse.redirect(url);
     }
