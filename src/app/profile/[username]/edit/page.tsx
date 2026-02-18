@@ -1,23 +1,65 @@
 "use client"
 import axios from "axios"
+import { useEffect } from "react"
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import type { FormDataInterface } from "@/interfaces/onboardingInterface"
-import { basicDetailsFields, codingProfilesFields,  developmentFields, educationFields, initialFormData,  socialFields, totalSteps } from "@/constants/onboardingConstant"
+import { basicDetailsFields, codingProfilesFields, developmentFields, educationFields, initialFormData,  socialFields, totalSteps } from "@/constants/onboardingConstant"
 import { LoadingSpinner } from "@/components/ui/ShimmerUI"
 
-export default function OnboardingPage() {
+export default function EditPage(){
     const router = useRouter()
     const [currentStep, setCurrentStep] = useState<number>(1)
     const [formData, setFormData] = useState<FormDataInterface>(initialFormData)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+    const [isFetching, setIsFetching] = useState<boolean>(true)
+
+    useEffect(() => {
+        const fetchProfile = async() => {
+            try {
+                const response = await axios.get(`/api/profile`) 
+                const profile = response.data
+                setFormData({
+                    basicDetails: {
+                        username: profile.username || ""
+                    },
+                    education: {
+                        degree: profile.education?.degree || "",
+                        college: profile.education?.college || "",
+                        gradYear: profile.education?.gradYear || new Date().getFullYear(),
+                        location: profile.education?.location || "",
+                        currentProfile: profile.education?.currentProfile || "",
+                    },
+                    social: {
+                        linkedin: profile.platforms.others?.linkedin || "",
+                        twitter: profile.platforms.others?.twitter || "",
+                        website: profile.platforms.others?.website || "",
+                    },
+                    development: {
+                        github: profile.platforms.dev?.github || "",
+                    },
+                    codingProfiles: {
+                        leetcode: profile.platforms.dsa?.leetcode || "",
+                        codeforces: profile.platforms.dsa?.codeforces || ""
+                    },
+                })
+            } 
+            catch (err){
+                setError("Failed to load profile.")
+            } 
+            finally{
+                setIsFetching(false)
+            }
+        }
+        fetchProfile()
+    }, [])
+
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target
-        //Clearing field error when user starts typing
         if(fieldErrors[name]){
             setFieldErrors((prev) => {
                 const newErrors = { ...prev }
@@ -90,7 +132,7 @@ export default function OnboardingPage() {
         setFieldErrors(errors)
         return Object.keys(errors).length === 0
     }
-
+    
     const nextStep = () => {
         if(currentStepValidator() && currentStep <= totalSteps) setCurrentStep(currentStep + 1)
     }
@@ -104,7 +146,7 @@ export default function OnboardingPage() {
         setIsLoading(true)
         setError(null)
         try {
-            const response = await axios.post("/api/onboarding", formData)
+            const response = await axios.put("/api/profile", formData)
             if(response.status === 200){
                 router.push(`/profile/${formData.basicDetails.username}`)
             }
@@ -116,7 +158,7 @@ export default function OnboardingPage() {
             setIsLoading(false)
         }
     }
-
+    
     const renderFormFields = () => {
         switch(currentStep){
         case 1:
@@ -247,9 +289,9 @@ export default function OnboardingPage() {
                 <div className="w-full lg:w-3/4 bg-gradient-to-br from-blue-50 to-blue-100 overflow-y-auto scrollbar-hide">
                     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
                         <div className="mb-6 lg:mb-8">
-                            <h1 className="text-2xl sm:text-3xl font-bold text-blue-900">Create Your Developer Profile</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-blue-900">Update Your Developer Profile</h1>
                             <p className="text-blue-700 mt-2 text-sm sm:text-base">
-                                Complete all steps to set up your professional profile
+                                Complete all steps to modify your professional profile
                             </p>
                         </div>
                         {error && (
@@ -277,12 +319,12 @@ export default function OnboardingPage() {
                                     Previous Step
                                 </button>
                                 {currentStep < totalSteps ? (
-                                    <button type="button" onClick={nextStep} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg text-sm sm:text-base">
+                                    <button type="button" onClick={nextStep} disabled={isFetching} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
                                         Continue
                                     </button>
                                     ) : (
-                                    <button type="button" onClick={submitHandler} disabled={isLoading} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg flex items-center justify-center text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
-                                        {isLoading ? (
+                                    <button type="button" onClick={submitHandler} disabled={isLoading || isFetching} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg flex items-center justify-center text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
+                                        {isLoading? (
                                             <>
                                                 <LoadingSpinner />
                                                 Processing...
@@ -311,4 +353,4 @@ export default function OnboardingPage() {
             </div>
         </div>
     ) 
-}
+} 
