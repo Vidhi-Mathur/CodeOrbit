@@ -161,5 +161,5 @@ export const ShimmerContest = () => {
 }
 
 export const LoadingSpinner = () => {
-    return <div className="w-5 h-5 border-2 border-t-transparent border-[#03357a] rounded-full animate-spin ml-1" />
+    return <div className="w-5 h-5 border-2 border-t-transparent border-[#03357a] rounded-full animate-spin ml-1 mr-1" />
 }
