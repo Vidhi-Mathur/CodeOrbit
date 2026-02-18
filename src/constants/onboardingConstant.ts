@@ -64,29 +64,9 @@ export const codingProfilesFields: FieldConfig<CodingProfilesInterface>[] = [{
         label: "LeetCode Profile",
         placeholder: "Your LeetCode Username (no url)"
     }, {
-        id: DSA_LINKS.GEEKSFORGEEKS,
-        label: "GeeksForGeeks Profile",
-        placeholder: "Your GeeksForGeeks Username"
-    }, {
         id: DSA_LINKS.CODEFORCES,
         label: "CodeForces Profile",
         placeholder: "Your CodeForces Username"
-    }, {
-        id: DSA_LINKS.CODECHEF,
-        label: "CodeChef Profile",
-        placeholder: "Your CodeChef Username"
-    }, {
-        id: DSA_LINKS.HACKERRANK,
-        label: "HackerRank Profile",
-        placeholder: "Your HackerRank Username"
-    }, {
-        id: DSA_LINKS.INTERVIEWBIT,
-        label: "InterviewBit Profile",
-        placeholder: "Your InterviewBit Username"
-    }, {
-        id: DSA_LINKS.CODINGNINJAS,
-        label: "CodingNinjas Profile",
-        placeholder: "Your CodingNinjas Username"
     }
 ]
 
@@ -103,6 +83,8 @@ export const initialFormData: FormDataInterface = {
     },
     social: { 
         linkedin: "", 
+        twitter: "",
+        website: ""
     },
     development: { 
         github: "" 

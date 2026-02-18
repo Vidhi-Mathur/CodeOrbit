@@ -70,12 +70,7 @@ export interface DevelopmentInterface {
 
 export interface CodingProfilesInterface {
     leetcode: string
-    geeksforgeeks?: string,
     codeforces: string,
-    codechef?: string
-    hackerrank?: string
-    interviewbit?: string,
-    codingninjas?: string
 }
 
 export interface InfoInterface {
