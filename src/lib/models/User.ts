@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 const schema = mongoose.Schema
 
-//Todo: Add validation, indexing for username may be
+//Todo: Zod Validation
 const UserSchema = new schema({
     name: {
         type: String,
@@ -11,12 +11,15 @@ const UserSchema = new schema({
         type: String,
         required: true,
         unique: true,
+        lowercase: true,
+        trim: true
     },
     password: {
         type: String,
         required: function (this: any) {
             return this.authProvider === "credentials"
         },
+        select: false
     },
     image: {
         type: String,
@@ -27,13 +30,15 @@ const UserSchema = new schema({
         type: String,
         required: true,
         enum: ["google", "github", "twitter", "credentials"],
+        select: false,
+        unique: false
     },
     authProviderId: {
         type: String,
         required: function (this: any) {
             return this.authProvider !== "credentials"
         },
-        unique: false
+        select: false
     },
     username: {
         type: String,
@@ -41,6 +46,8 @@ const UserSchema = new schema({
         required: function (this: any): boolean {
             return this.isOnboarded 
         },
+        lowercase: true,
+        trim: true
     },
     isOnboarded: {
         type: Boolean,
@@ -93,33 +100,13 @@ const UserSchema = new schema({
                     return parentDoc ? parentDoc.isOnboarded : false;
                 },
             },
-            geeksforgeeks: {
-                type: String,
-                required: false,
-            },
             codeforces: {
                 type: String,
                 required: function (this: any): boolean {
                     const parentDoc = this.ownerDocument ? this.ownerDocument() : null;
                     return parentDoc ? parentDoc.isOnboarded : false;
                 },
-            },
-            codechef: {
-                type: String,
-                required: false,
-            },
-            hackerrank: {
-                type: String,
-                required: false,
-            },
-            interviewbit: {
-                type: String,
-                required: false,
-            },
-            codingninjas: {
-                type: String,
-                required: false,
-            },
+            }
         },
         dev: {
             github: {
@@ -150,6 +137,9 @@ const UserSchema = new schema({
             }
         }
     },
-  }, {  timestamps: true })
+  }, {  timestamps: true, versionKey: false })
+
+  UserSchema.index({ username: 1 }, { unique: true })
+  UserSchema.index({ email: 1 }, { unique: true })
 
 export default mongoose.models.User || mongoose.model("User", UserSchema)
