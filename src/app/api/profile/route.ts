@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth"
 import connectToDB from "@/lib/connect"
 import User from "@/lib/models/User"
 import { authOptions } from "@/lib/authOptions"
+import { OnboardingSchema } from "@/lib/validations/onboarding"
+import { removeEmptyStrings } from "@/lib/helper"
 
 export async function GET() {
     const session = await getServerSession(authOptions)
@@ -24,42 +26,42 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
     await connectToDB()
-    const { basicDetails, education, social, development, codingProfiles } = await req.json()
-    try {
-        if(!basicDetails?.username || !education?.degree || !education?.college || !education?.gradYear || !education?.location || !education?.currentProfile || !codingProfiles?.leetcode || !development?.github || !social?.linkedin){
-            return NextResponse.json({ message: "Missing required fields for onboarding" }, { status: 400 })
+    const body = await req.json()
+        try {
+        const parsed = OnboardingSchema.strict().safeParse(body)
+        if(!parsed.success){
+            const formattedErrors: Record<string, string> = {}
+            parsed.error.issues.forEach((issue) => {
+                const fieldName = issue.path[issue.path.length - 1] as string
+                formattedErrors[fieldName] = issue.message
+            })          
+            return NextResponse.json({
+                errors: {
+                    fieldErrors: formattedErrors
+                }
+            }, { status: 400 })
         }
+        const { basicDetails, education, codingProfiles, development, social } = parsed.data
+        const existingUsername = await User.findOne({ username: basicDetails.username, email: { $ne: session.user.email }})
+        if(existingUsername){
+            return NextResponse.json({ message: "Username already taken" }, { status: 409 })
+        }
+        removeEmptyStrings(education)
+        removeEmptyStrings(social)
         let updatedFields: any = {
             username: basicDetails.username,
             isOnboarded: true,
-            education: {
-                degree: education.degree,
-                branch: education?.branch?.trim()? education.branch.trim(): undefined,
-                college: education.college,
-                gradYear: Number(education.gradYear),
-                location: education.location,
-                currentProfile: education.currentProfile
-            },
+            education,
             platforms: {
-                dsa: {
-                    leetcode: codingProfiles.leetcode ,
-                    codeforces: codingProfiles.codeforces
-                },
-                dev: {
-                    github: development.github
-                },
-                others: {
-                    website: social?.website?.trim()? social.website.trim(): undefined,
-                    linkedin: social.linkedin,
-                    twitter: social?.twitter?.trim()? social.twitter.trim(): undefined
-                }
+                dsa: codingProfiles,
+                dev: development,
+                social
             }
         }
         const updatedUser = await User.findOneAndUpdate({ email: session.user.email }, { $set: updatedFields }, { new: true })
         return NextResponse.json({ message: "User updated successfully", user: updatedUser }, { status: 200 })
     } 
     catch(err){
-        console.log(err)
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
     }
 }
