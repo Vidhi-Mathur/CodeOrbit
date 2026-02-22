@@ -6,7 +6,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import type { FormDataInterface } from "@/interfaces/onboardingInterface"
-import { basicDetailsFields, codingProfilesFields, developmentFields, educationFields, initialFormData,  socialFields, totalSteps } from "@/constants/onboardingConstant"
+import { basicDetailsFields, codingProfilesFields, developmentFields, educationFields, initialFormData,  socialFields, stepConfig, totalSteps } from "@/constants/onboardingConstant"
 import { LoadingSpinner } from "@/components/ui/ShimmerUI"
 import { useSession } from "next-auth/react"
 
@@ -36,14 +36,15 @@ export default function EditPage(){
                     education: {
                         degree: profile.education?.degree || "",
                         college: profile.education?.college || "",
+                        branch: profile.education?.branch || "",
                         gradYear: profile.education?.gradYear || new Date().getFullYear(),
                         location: profile.education?.location || "",
                         currentProfile: profile.education?.currentProfile || "",
                     },
                     social: {
-                        linkedin: profile.platforms.others?.linkedin || "",
-                        twitter: profile.platforms.others?.twitter || "",
-                        website: profile.platforms.others?.website || "",
+                        linkedin: profile.platforms.social?.linkedin || "",
+                        twitter: profile.platforms.social?.twitter || "",
+                        website: profile.platforms.social?.website || "",
                     },
                     development: {
                         github: profile.platforms.dev?.github || "",
@@ -73,42 +74,14 @@ export default function EditPage(){
                 return newErrors
             })
         }
-        setFormData((prev) => {
-            if(!prev) return prev
-            const updatedSection = (section: any) => ({
-                ...section,
-                [name]: name === "gradYear" ? Number.parseInt(value) || new Date().getFullYear() : value,
-            })
-            switch(currentStep){
-            case 1:
-                return {
-                    ...prev,
-                    basicDetails: updatedSection(prev.basicDetails)
-                }
-            case 2:
-                return {
-                    ...prev,
-                    education: updatedSection(prev.education)
-                }
-            case 3:
-                return {
-                    ...prev,
-                    social: updatedSection(prev.social)
-                }
-            case 4:
-                return {
-                    ...prev,
-                    development: updatedSection(prev.development)
-                }
-            case 5:
-                return {
-                    ...prev,
-                    codingProfiles: updatedSection(prev.codingProfiles)
-                }
-            default:
-                return prev
-            }
-        })
+        const sectionKey = stepConfig[currentStep - 1].key
+        setFormData(prev => ({
+            ...prev,
+            [sectionKey]: {
+                ...prev[sectionKey],
+                [name]: name === "gradYear"? Number.parseInt(value) || new Date().getFullYear(): value,
+            },
+        }))
     }
 
     const currentStepValidator = () => {
@@ -157,8 +130,16 @@ export default function EditPage(){
                 router.push(`/profile/${formData.basicDetails.username}`)
             }
         } 
-        catch (err) {
-            setError("Something went wrong. Try again.")
+        catch(err){
+            if(axios.isAxiosError(err) && err.response?.data?.errors?.fieldErrors){
+                const backendErrors = err.response.data.errors.fieldErrors
+                setFieldErrors(backendErrors)
+                //Todo: Auto navigate to step
+                const firstErrorField = Object.keys(backendErrors)[0]
+                const stepIndex = stepConfig.findIndex(step => step.fields.some(field => field.id === firstErrorField))
+                if(stepIndex !== -1) setCurrentStep(stepIndex + 1)
+            } 
+            else setError("Something went wrong. Try again.")
         } 
         finally {
             setIsLoading(false)
