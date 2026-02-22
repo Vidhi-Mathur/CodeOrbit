@@ -151,3 +151,9 @@ export const getRedirection = (key: InfoLink, info: AboutProps["info"], email: s
             return "/";
     }
 }
+
+export const removeEmptyStrings = (obj: Record<string, any>) => {
+    Object.keys(obj).forEach((key) => {
+        if(obj[key] === "") delete obj[key]
+    })
+}

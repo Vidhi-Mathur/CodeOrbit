@@ -6,6 +6,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import User from "./models/User";
 import connectToDB from "./connect";
+import { CredentialsSchema } from "./validations/credentials";
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -23,23 +24,32 @@ export const authOptions: AuthOptions = {
                     throw new Error("Missing credentials");
                 }
                 const { name, email, password } = credentials;
-                if(!email || !password){
-                    throw new Error("Please provide your email and password.");
+                const parsed = CredentialsSchema.safeParse(credentials)
+                if(!parsed.success){
+                    throw new Error(parsed.error.issues[0].message)
                 }
-                const existingUser = await User.findOne({ email });
+                const existingUser = await User.findOne({ email }).select("+password +authProvider");
                 if(existingUser){
-                    if(existingUser.authProvider !== "credentials"){
+                    if(existingUser && existingUser.authProvider !== "credentials"){
                         throw new Error(`Please login using ${existingUser.authProvider}`);
                     }
                     const dbPassword = await bcrypt.compare(password, existingUser.password);
                     if(!dbPassword){
                         throw new Error("Invalid credentials");
                     }
-                    return existingUser;
+                    delete existingUser.password
+                    return {
+                        id: existingUser._id.toString(), 
+                        name: existingUser.name, 
+                        email: existingUser.email, 
+                        image: existingUser.image, 
+                        isOnboarded: existingUser.isOnboarded, 
+                        authProvider: existingUser.authProvider
+                    }
                 }
                 else {
                     if(!name){
-                        throw new Error("Name is required to create a new account.");
+                        throw new Error(`Name is required`);
                     }
                     const hashedPassword = await bcrypt.hash(password, 10);
                     const newUser = await User.create({
@@ -49,7 +59,14 @@ export const authOptions: AuthOptions = {
                         authProvider: "credentials",
                         isOnboarded: false,
                     })
-                return newUser;   
+                    return {
+                        id: newUser._id.toString(), 
+                        name: newUser.name, 
+                        email: newUser.email, 
+                        image: newUser.image, 
+                        isOnboarded: newUser.isOnboarded, 
+                        authProvider: newUser.authProvider
+                    }  
                 }
             },
         }),
@@ -90,12 +107,19 @@ export const authOptions: AuthOptions = {
         }
         return true;
         },
-        async jwt({ token }){
-            await connectToDB();
-            const dbUser = await User.findOne({ email: token.email });
-            if(dbUser) {
-                token.isOnboarded = dbUser.isOnboarded;
-                token.username = dbUser.username;
+        async jwt({ token, user }){
+            if(user){
+                token.isOnboarded = user.isOnboarded
+                token.username = user.username
+                return token
+            }
+            if(!token.username){
+                await connectToDB();
+                const dbUser = await User.findOne({ email: token.email });
+                if(dbUser) {
+                    token.isOnboarded = dbUser.isOnboarded;
+                    token.username = dbUser.username;
+                }
             }
             return token;
         },

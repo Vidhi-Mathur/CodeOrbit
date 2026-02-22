@@ -37,7 +37,7 @@ export interface ProfileComponentProps {
         platforms: {
             dsa: CodingProfilesInterface
             dev: DevelopmentInterface
-            others: InfoInterface
+            social: InfoInterface
         }
     }
 };
