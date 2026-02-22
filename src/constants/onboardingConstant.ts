@@ -70,11 +70,29 @@ export const codingProfilesFields: FieldConfig<CodingProfilesInterface>[] = [{
     }
 ]
 
+export const stepConfig = [{ 
+    key: "basicDetails", 
+    fields: basicDetailsFields 
+}, { 
+    key: "education", 
+    fields: educationFields 
+}, { 
+    key: "social", 
+    fields: socialFields 
+}, { 
+    key: "development", 
+    fields: developmentFields
+}, { 
+    key: "codingProfiles", 
+    fields: codingProfilesFields 
+}] as const
+
 export const initialFormData: FormDataInterface = {
     basicDetails: { 
         username: "" 
     },
     education: {
+        branch: "",
         degree: "", 
         college: "", 
         gradYear: new Date().getFullYear(),

@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import type { FormDataInterface } from "@/interfaces/onboardingInterface"
-import { basicDetailsFields, codingProfilesFields,  developmentFields, educationFields, initialFormData,  socialFields, totalSteps } from "@/constants/onboardingConstant"
+import { basicDetailsFields, codingProfilesFields,  developmentFields, educationFields, initialFormData, socialFields, stepConfig, totalSteps } from "@/constants/onboardingConstant"
 import { LoadingSpinner } from "@/components/ui/ShimmerUI"
 
 export default function OnboardingPage() {
@@ -17,7 +17,6 @@ export default function OnboardingPage() {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target
-        //Clearing field error when user starts typing
         if(fieldErrors[name]){
             setFieldErrors((prev) => {
                 const newErrors = { ...prev }
@@ -25,44 +24,15 @@ export default function OnboardingPage() {
                 return newErrors
             })
         }
-        setFormData((prev) => {
-            if(!prev) return prev
-            const updatedSection = (section: any) => ({
-                ...section,
-                [name]: name === "gradYear" ? Number.parseInt(value) || new Date().getFullYear() : value,
-            })
-            switch(currentStep){
-            case 1:
-                return {
-                    ...prev,
-                    basicDetails: updatedSection(prev.basicDetails)
-                }
-            case 2:
-                return {
-                    ...prev,
-                    education: updatedSection(prev.education)
-                }
-            case 3:
-                return {
-                    ...prev,
-                    social: updatedSection(prev.social)
-                }
-            case 4:
-                return {
-                    ...prev,
-                    development: updatedSection(prev.development)
-                }
-            case 5:
-                return {
-                    ...prev,
-                    codingProfiles: updatedSection(prev.codingProfiles)
-                }
-            default:
-                return prev
-            }
-        })
+        const sectionKey = stepConfig[currentStep - 1].key
+        setFormData(prev => ({
+            ...prev,
+            [sectionKey]: {
+                ...prev[sectionKey],
+                [name]: name === "gradYear"? Number.parseInt(value) || new Date().getFullYear(): value,
+            },
+        }))
     }
-
     const currentStepValidator = () => {
         const errors: Record<string, string> = {}
         switch(currentStep){
@@ -109,8 +79,16 @@ export default function OnboardingPage() {
                 router.push(`/profile/${formData.basicDetails.username}`)
             }
         } 
-        catch (err) {
-            setError("Something went wrong. Try again.")
+        catch(err: any){
+            if(axios.isAxiosError(err) && err.response?.data?.errors?.fieldErrors){
+                const backendErrors = err.response.data.errors.fieldErrors
+                setFieldErrors(backendErrors)
+                //Todo: Auto navigate to step
+                const firstErrorField = Object.keys(backendErrors)[0]
+                const stepIndex = stepConfig.findIndex(step => step.fields.some(field => field.id === firstErrorField))
+                if(stepIndex !== -1) setCurrentStep(stepIndex + 1)
+            }  
+        else setError("Something went wrong. Try again.")
         } 
         finally {
             setIsLoading(false)
