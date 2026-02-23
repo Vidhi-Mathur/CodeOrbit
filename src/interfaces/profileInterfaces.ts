@@ -1,5 +1,6 @@
 import { DevLink, DsaLink, ProfileTabs } from "@/constants/profileConstant";
 import { SideBarProps } from "./hompageInterface";
+import { FormDataInterface } from "./onboardingInterface";
 
 export interface CurvedNavProps {
     activeTab: ProfileTabs
@@ -53,6 +54,13 @@ export interface ProfileHeaderProps {
     onTabChange: (tab: ProfileTabs) => void
     onRefresh: () => void
     refreshState: RefreshInterface
+}
+
+export interface ProfileFormProps {
+    mode: "create" | "edit",
+    initialData?: FormDataInterface,
+    onSubmit: (data: FormDataInterface) => Promise<void>
+    isFetching?: boolean
 }
 
 export interface EducationInterface {

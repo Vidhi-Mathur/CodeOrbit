@@ -107,19 +107,12 @@ export const authOptions: AuthOptions = {
         }
         return true;
         },
-        async jwt({ token, user }){
-            if(user){
-                token.isOnboarded = user.isOnboarded
-                token.username = user.username
-                return token
-            }
-            if(!token.username){
-                await connectToDB();
-                const dbUser = await User.findOne({ email: token.email });
-                if(dbUser) {
-                    token.isOnboarded = dbUser.isOnboarded;
-                    token.username = dbUser.username;
-                }
+        async jwt({ token }){
+            await connectToDB();
+            const existingUser = await User.findOne({ email: token.email });
+            if(existingUser){
+                token.isOnboarded = existingUser.isOnboarded;
+                token.username = existingUser.username;
             }
             return token;
         },
