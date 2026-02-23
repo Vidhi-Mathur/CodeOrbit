@@ -13,8 +13,8 @@ export const OnboardingSchema = z.object({
         currentProfile: z.enum(["Student", "Fresher", "Working Professional", "Freelancer", "Other"])
     }),
     codingProfiles: z.object({
-        leetcode: z.string().trim().min(1, "Leetcode username must be at least 1 character"),
-        codeforces: z.string().trim().min(1, "Codeforces username  must be at least 1 character")
+        leetcode: z.string().trim().optional().or(z.literal("")),
+        codeforces: z.string().trim().optional().or(z.literal(""))
     }),
     development: z.object({
         github: z.string().trim().min(1, "Github username must be at least 1 character")
@@ -24,4 +24,18 @@ export const OnboardingSchema = z.object({
         website: z.string().trim().url().optional().or(z.literal("")),
         twitter: z.string().trim().optional().or(z.literal(""))
     })
+}).superRefine((data, ctx) => {
+    const { leetcode, codeforces } = data.codingProfiles
+    if(!leetcode && !codeforces){
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["codingProfiles", "leetcode"],
+            message: "Provide at least one DSA profile (LeetCode or Codeforces)"
+        })  
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["codingProfiles", "codeforces"],
+            message: "Provide at least one DSA profile (LeetCode or Codeforces)"
+        })
+    }
 })

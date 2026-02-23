@@ -86,3 +86,9 @@ export interface InfoInterface {
     linkedin: string,
     twitter?: string
 }
+
+export interface PlatformStateProps { 
+    icon: string,
+    title: string, 
+    message: string
+}

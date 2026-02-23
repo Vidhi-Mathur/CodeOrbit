@@ -61,8 +61,11 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
             if(!formData.development.github.trim()) errors.github = "GitHub username is required"
             break
         case 5:
-            if(!formData.codingProfiles.leetcode.trim()) errors.leetcode = "LeetCode username is required"
-            if(!formData.codingProfiles.codeforces.trim()) errors.codeforces = "Codeforces username is required"
+            const { leetcode, codeforces } = formData.codingProfiles
+            if(!leetcode.trim() && !codeforces.trim()) {
+                errors.leetcode = "At least one DSA profile is required"
+                errors.codeforces = "At least one DSA profile is required"
+            }
             break
         }
         setFieldErrors(errors)
@@ -192,13 +195,13 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
         case 5:
             return (
                 <div className="space-y-5">
-                    <h2 className="text-2xl font-bold text-blue-800 mb-6">Coding Profiles</h2>
+                    <h2 className="text-2xl font-bold text-blue-800 mb-2">Coding Profiles</h2>
+                    <p className="text-sm text-blue-600 mb-6">Provide at least one profile (LeetCode or Codeforces)</p>
                     {codingProfilesFields.map((input) => {
-                        const isRequired = input.id === "leetcode" || input.id === "codeforces"
                         return (
                             <div key={input.id}>
                                 <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
-                                    {input.label} {isRequired && <span className="text-red-500">*</span>}
+                                    {input.label}
                                 </label>
                                 <input type="text" id={input.id} name={input.id} value={formData.codingProfiles[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300"}`} placeholder={input.placeholder}/>
                                 {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}

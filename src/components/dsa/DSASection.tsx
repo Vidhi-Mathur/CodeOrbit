@@ -10,17 +10,21 @@ import { CodeForcesProfile } from "./codeforces/CodeForcesProfile"
 import { CodeForcesContest } from "./codeforces/CodeForcesContest"
 import { CodeForcesProblemBreakdown } from "./codeforces/CodeForcesProblemBreakdown"
 import { useCodeforcesQuery } from "@/hooks/useCodeForces"
+import { PlatformStateCard } from "../ui/PlatformStateCard"
 
 export const DSASection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
+    const leetcodeUsername = user?.platforms?.dsa?.leetcode
+    const codeforcesUsername = user?.platforms?.dsa?.codeforces
     const isLeetcodeActive = activePlatform === DSA_LINKS.LEETCODE
-    const { data: leetcodeData, isLoading: leetcodeLoading, error: leetcodeNetworkError } = useLeetcodeQuery(isLeetcodeActive? user.platforms.dsa.leetcode: undefined)
+    const isCodeforcesActive = activePlatform === DSA_LINKS.CODEFORCES
+
+    const { data: leetcodeData, isLoading: leetcodeLoading, error: leetcodeNetworkError } = useLeetcodeQuery(leetcodeUsername && isLeetcodeActive? user.platforms.dsa.leetcode: undefined)
     const leetcodeProfile = leetcodeData?.profileResponse
     const leetcodeContest = leetcodeData?.contestResponse
     const leetcodeCalendar = leetcodeData?.submissionCalendarResponse
     const leetcodeApiErrors = leetcodeData?.errors
 
-    const isCodeforcesActive = activePlatform === DSA_LINKS.CODEFORCES
-    const { data: codeforcesData, isLoading: codeforcesLoading, error: codeforcesNetworkError } = useCodeforcesQuery(isCodeforcesActive? user.platforms.dsa.codeforces: undefined)
+    const { data: codeforcesData, isLoading: codeforcesLoading, error: codeforcesNetworkError } = useCodeforcesQuery(codeforcesUsername && isCodeforcesActive? user.platforms.dsa.codeforces: undefined)
     const codeforcesProfile = codeforcesData?.profileResponse
     const codeforcesContest = codeforcesData?.contestResponse
     const codeforcesProblemBreakdown = codeforcesData?.problemBreakdownResponse
@@ -48,14 +52,14 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                         {leetcodeApiErrors?.calendar}
                     </div>
                     ): (
-                    leetcodeCalendar && (
-                    <div className="p-2 sm:p-3">
+                        leetcodeCalendar && (
+                            <div className="p-2 sm:p-3">
                         <LeetCodeCalendar
                             calendarMap={
                                 typeof leetcodeCalendar === "object" && "submissionCalendar" in leetcodeCalendar
-                                  ? { [new Date().getFullYear()]: leetcodeCalendar }
-                                  : leetcodeCalendar}
-                            />
+                                ? { [new Date().getFullYear()]: leetcodeCalendar }
+                                : leetcodeCalendar}
+                                />
                     </div>
                 ))}
                 {leetcodeApiErrors?.contest ? (
@@ -76,7 +80,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
     }
     else if(activePlatform === DSA_LINKS.CODEFORCES){
         return (
-        <>
+            <>
         {codeforcesLoading && (
             <>
             <ShimmerContest />
@@ -89,8 +93,8 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                     {codeforcesApiErrors?.problemBreakdown}
                 </div>
                 ): (
-                codeforcesProblemBreakdown && (
-                <div className="p-2 sm:p-3">
+                    codeforcesProblemBreakdown && (
+                        <div className="p-2 sm:p-3">
                     <CodeForcesProblemBreakdown problemBreakdown={codeforcesProblemBreakdown} />
                 </div>
             ))}
@@ -101,12 +105,13 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
         )
     }
     return null
-  }
+}
 
-    const renderMainContent = () => {
-        if(activePlatform === DSA_LINKS.LEETCODE){
-            return (
-                <>
+const renderMainContent = () => {
+    if(activePlatform === DSA_LINKS.LEETCODE){
+        return (
+            <>
+                {!leetcodeUsername && <PlatformStateCard icon="🔌" title="Not Connected" message={`${activePlatform} profile is not connected to this account.`} />}
                 {leetcodeLoading && <ShimmerProfile />}
                 {leetcodeApiErrors?.profile? (
                     <div className="sm:-mt-15 lg:-mt-20 bg-red-50 ml-2 sm:ml-3 lg:ml-12 p-3 sm:p-4 lg:p-4 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
@@ -121,8 +126,9 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
         else if(activePlatform === DSA_LINKS.CODEFORCES){
             return (
                 <>
+                {!codeforcesUsername && <PlatformStateCard icon="🔌" title="Not Connected" message={`${activePlatform} profile is not connected to this account.`} />}
                 {codeforcesLoading && (
-                <>
+                    <>
                 <ShimmerProfile />
                 <ShimmerProfile />
                 </>
@@ -148,16 +154,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                 </>
             )
         }
-
-        return (
-            <div className="flex items-center justify-center h-64 bg-white rounded-lg m-3 sm:m-4 lg:m-6 sm:rounded-lg md:rounded-lg lg:rounded-xl shadow-md overflow-hidden w-full max-w-[95%] mx-auto lg:ml-auto lg:mr-0 relative">
-                <div className="text-center">
-                    <div className="text-6xl mb-4">🚀</div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Coming Soon</h3>
-                    <p className="text-gray-600 capitalize">{activePlatform} integration is under development</p>
-                </div>
-            </div>
-        )
+        return <PlatformStateCard icon="🚀" title="Coming Soon" message={`${activePlatform} integration is under development.`}/>
     }
 
     return (

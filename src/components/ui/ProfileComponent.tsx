@@ -11,7 +11,14 @@ import { useQueryClient } from "@tanstack/react-query"
 const ProfileComponent = ({ user }: ProfileComponentProps) => {
     const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState<ProfileTabs>(PROFILE_TABS.PROBLEM_SOLVING)
-    const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>(DSA_LINKS.LEETCODE)
+    let defaultPlatform: DsaLink = DSA_LINKS.LEETCODE;
+    if(user?.platforms?.dsa?.leetcode) {
+        defaultPlatform = DSA_LINKS.LEETCODE;
+    } 
+    else if(user?.platforms?.dsa?.codeforces){
+        defaultPlatform = DSA_LINKS.CODEFORCES;
+    }
+    const [activePlatform, setActivePlatform] = useState<DsaLink | DevLink>(defaultPlatform)
     const [refreshState, setRefreshState] = useState<RefreshInterface>({ status: "idle" })
 
     const getUsername = (platform: DsaLink | DevLink): string | undefined => {

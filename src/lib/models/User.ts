@@ -1,7 +1,6 @@
 import mongoose from "mongoose"
 const schema = mongoose.Schema
 
-//Todo: Zod Validation
 const UserSchema = new schema({
     name: {
         type: String,
