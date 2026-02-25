@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import type { GitHubDataInterface, GithubErrorInterface, GitHubProfileInterface, GitHubRepoInterface } from '@/interfaces/dev/github/githubInterface'
 import { unstable_cache } from 'next/cache'
@@ -97,16 +97,31 @@ const calendarQuery = `
     }
 `
 
-const fetchGitHubData = async(github_username: string): Promise<GitHubDataInterface> => {
-    const token = process.env.GITHUB_AUTH_KEY!
-    const headers = { Authorization: `Bearer ${token}` }
+const verifyQuery = `
+    query verifyUser($github_username: String!){
+        user(login: $github_username) {
+            login
+        }
+    }
+`
 
+const token = process.env.GITHUB_AUTH_KEY!
+const headers = { Authorization: `Bearer ${token}` }
+
+const fetchGitHubData = async(github_username: string): Promise<GitHubDataInterface> => {
     //Fetch profile and repos
-    const profileRes = await axios.post('https://api.github.com/graphql', { query: profileQuery, variables: { github_username }}, { headers })
+    const profileRes = await axios.post('https://api.github.com/graphql', { 
+        query: profileQuery, 
+        variables: { 
+            github_username 
+        }
+    }, { headers })
     const user = profileRes.data?.data?.user
     
     if(!user){
-        throw new Error("GitHub user not found")
+        const error: any = new Error("GitHub user not found")
+        error.code = 404
+        throw error
     }
 
     const profileResponse: GitHubProfileInterface = {
@@ -171,6 +186,16 @@ const fetchGitHubData = async(github_username: string): Promise<GitHubDataInterf
     return { profileResponse, reposResponse, calendarResponse, errors }
 }
 
+const verifyGithub = async(github_username: string) => {
+    const verificationResponse = await axios.post('https://api.github.com/graphql', { 
+        query: verifyQuery, 
+        variables: { 
+            github_username 
+        }
+    }, { headers })
+    return !!verificationResponse.data?.data?.user;
+}
+
 const getCachedGithubData = (github_username: string) => unstable_cache(() => 
     fetchGitHubData(github_username), [`github-${github_username}`], {
         revalidate:  3600,
@@ -182,15 +207,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ gith
     const { github_username } = await params
 
     if(!github_username){
-        return Response.json({ error: "Github Username is required" }, { status: 400 })
+        return NextResponse.json({ error: "Github Username is required" }, { status: 400 })
     }
 
     try {
+        const verifyMode = req.nextUrl.searchParams.get("verify") === "true"
+        if(verifyMode){
+            const isValid = await verifyGithub(github_username)
+            if(!isValid){
+                return NextResponse.json({ valid: false, message: "GitHub user not found" }, { status: 404 })
+            }
+            return NextResponse.json({ valid: true }, { status: 200 });
+        }
         //() as unstable_cache returns function, so call it first to get data
         const { profileResponse, reposResponse, calendarResponse, errors } = await getCachedGithubData(github_username)()
-        return Response.json({ profileResponse, reposResponse, calendarResponse, errors }, { status: 200 })
+        return NextResponse.json({ profileResponse, reposResponse, calendarResponse, errors }, { status: 200 })
     } 
     catch(err: any){
-        return Response.json({ error: "Failed to fetch GitHub data" }, { status: 500 })
+        if(err.code === 404){
+            return NextResponse.json({ error: "GitHub user not found" }, { status: 404 });
+        }
+        return NextResponse.json({ error: "Failed to fetch GitHub data" }, { status: 500 })
     }
 }

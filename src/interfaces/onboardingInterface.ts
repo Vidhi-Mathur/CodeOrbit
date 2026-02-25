@@ -17,3 +17,12 @@ export interface FormDataInterface {
 export interface BasicDetailsInterface {
     username: string
 }
+
+export type Status = "idle" | "checking" | "valid" | "invalid"
+
+export interface Options {
+    value: string,
+    urlBuilder: (value: string) => string,
+    delay?: number,
+    enabled?: boolean;
+}

@@ -33,37 +33,43 @@ const profileQuery = `
             }
         }
     }
-    `
+`
 
-    const contestQuery = `
-        query userContestRankingInfo($leetcode_username: String!) {
-            userContestRanking(username: $leetcode_username) {
-                attendedContestsCount
-                rating
-                globalRanking
-                totalParticipants
-                topPercentage
+const contestQuery = `
+    query userContestRankingInfo($leetcode_username: String!) {
+        userContestRanking(username: $leetcode_username) {
+            attendedContestsCount
+            rating
+            globalRanking
+            totalParticipants
+            topPercentage
+        }
+    }
+`;
+const calendarQuery = `
+    query userProfileCalendar($username: String!, $year: Int) {
+        matchedUser(username: $username) {
+            userCalendar(year: $year) {
+                activeYears
+                streak
+                totalActiveDays
+                submissionCalendar
             }
         }
-    `;
-
-    const calendarQuery = `
-        query userProfileCalendar($username: String!, $year: Int) {
-            matchedUser(username: $username) {
-                userCalendar(year: $year) {
-                    activeYears
-                    streak
-                    totalActiveDays
-                    submissionCalendar
-                }
-            }
+    }
+`
+const verifyQuery = `
+    query verifyUser($leetcode_username: String!) {
+        matchedUser(username: $leetcode_username) {
+            username
         }
-    `
+    }
+`;
 
 const fetchLeetcodeData = async(leetcode_username: string): Promise<LeetCodeDataInterface> => {
     const headers = {
-            'Content-Type': 'application/json',
-            Referer: `https://leetcode.com/${leetcode_username}/`,
+        'Content-Type': 'application/json',
+        Referer: `https://leetcode.com/${leetcode_username}/`,
     }
  
     const [profileRes, contestRes, initialCalendarRes] = await Promise.allSettled([
@@ -152,6 +158,20 @@ const fetchLeetcodeData = async(leetcode_username: string): Promise<LeetCodeData
     return { profileResponse, contestResponse, submissionCalendarResponse, errors }
 }
 
+const verifyLeetcode = async(leetcode_username: string) => {
+    const headers = {
+        'Content-Type': 'application/json',
+        Referer: `https://leetcode.com/${leetcode_username}/`,
+    };
+    const verificationResponse = await axios.post('https://leetcode.com/graphql', { 
+        query: verifyQuery, 
+        variables: { 
+            leetcode_username 
+        }
+    }, { headers })
+    return !!verificationResponse.data.data?.matchedUser;
+}
+
 const getCachedLeetcodeData = (leetcode_username: string) => unstable_cache(() => 
     fetchLeetcodeData(leetcode_username), [`leetcode-${leetcode_username}`], {
         revalidate: 3600,
@@ -165,8 +185,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ leet
     if(!leetcode_username){
         return NextResponse.json({ error: "Username is required" }, { status: 400 });
     }
-
+    
     try {
+        const verifyMode = req.nextUrl.searchParams.get("verify") === "true"
+        if(verifyMode){
+            const isValid = await verifyLeetcode(leetcode_username)
+            if(!isValid){
+                return NextResponse.json({ valid: false, message: "Leetcode user not found" }, { status: 404 })
+            }
+            return NextResponse.json({ valid: true }, { status: 200 });
+        }
         const { profileResponse, contestResponse, submissionCalendarResponse, errors } = await getCachedLeetcodeData(leetcode_username)()
         return NextResponse.json({ profileResponse, contestResponse, submissionCalendarResponse, errors }, { status: 200 })
     } 

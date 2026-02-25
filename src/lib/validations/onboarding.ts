@@ -20,9 +20,9 @@ export const OnboardingSchema = z.object({
         github: z.string().trim().min(1, "Github username must be at least 1 character")
     }),
     social: z.object({
-        linkedin: z.string().trim().min(1, "Linkedin username must be at least 1 character"),
+        linkedin: z.string().trim().regex(/^[a-zA-Z0-9-]{3,100}$/, "Username should be between 3 to 100 characters, only letters, numbers and hypens allowed"),
         website: z.string().trim().url().optional().or(z.literal("")),
-        twitter: z.string().trim().optional().or(z.literal(""))
+        twitter: z.string().trim().regex(/^[A-Za-z0-9_]{5,15}$/, "Username should be between 5 to 15 characters, only letters, numbers, and underscores allowed").optional().or(z.literal(""))
     })
 }).superRefine((data, ctx) => {
     const { leetcode, codeforces } = data.codingProfiles

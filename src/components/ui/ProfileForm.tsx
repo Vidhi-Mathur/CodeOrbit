@@ -8,6 +8,7 @@ import type { FormDataInterface } from "@/interfaces/onboardingInterface"
 import { basicDetailsFields, codingProfilesFields, developmentFields, educationFields, initialFormData, socialFields, stepConfig, totalSteps } from "@/constants/onboardingConstant"
 import { LoadingSpinner } from "@/components/ui/ShimmerUI"
 import { ProfileFormProps } from "@/interfaces/profileInterfaces"
+import { useVerification } from "@/hooks/useVerification"
 
 export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFetching = false}: ProfileFormProps) => {
     const [currentStep, setCurrentStep] = useState<number>(1)
@@ -15,6 +16,25 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+    const githubStatus = useVerification({
+        value: formData.development.github,
+        urlBuilder: (username) =>  `/api/dev/github/${username}?verify=true`,
+        enabled: currentStep === 4
+    })
+
+    const leetcodeStatus = useVerification({
+        value: formData.codingProfiles.leetcode,
+        urlBuilder: (username) =>  `/api/dsa/leetcode/${username}?verify=true`,
+        enabled: currentStep === 5
+    })
+
+    const codeforcesStatus = useVerification({
+        value: formData.codingProfiles.codeforces,
+        urlBuilder: (username) =>  `/api/dsa/codeforces/${username}?verify=true`,
+        enabled: currentStep === 5
+    })
+
 
     useEffect(() => {
         if(mode === "edit"){
@@ -58,15 +78,24 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
             if(!formData.social.linkedin.trim()) errors.linkedin = "LinkedIn username is required"
             break
         case 4:
-            if(!formData.development.github.trim()) errors.github = "GitHub username is required"
+            if(!formData.development.github.trim()) errors.github = "GitHub username is required";
+            else if(githubStatus === "checking") errors.github = "Verifying GitHub username...";
+            else if(githubStatus !== "valid") errors.github = "Please enter a valid GitHub username";
             break
-        case 5:
-            const { leetcode, codeforces } = formData.codingProfiles
-            if(!leetcode.trim() && !codeforces.trim()) {
-                errors.leetcode = "At least one DSA profile is required"
-                errors.codeforces = "At least one DSA profile is required"
+        case 5: 
+            const { leetcode, codeforces } = formData.codingProfiles;
+            const hasLeetcode = leetcode.trim();
+            const hasCodeforces = codeforces.trim();
+            if(hasLeetcode && leetcodeStatus === "checking") errors.leetcode = "Verifying LeetCode username...";
+            if(hasCodeforces && codeforcesStatus === "checking") errors.codeforces = "Verifying CodeForces username...";
+            if(errors.leetcode || errors.codeforces) break;
+            const isLeetcodeValid = hasLeetcode && leetcodeStatus === "valid";
+            const isCodeforcesValid = hasCodeforces && codeforcesStatus === "valid";
+            if(!isLeetcodeValid && !isCodeforcesValid){
+                errors.leetcode = "Provide at least one valid DSA profile";
+                errors.codeforces = "Provide at least one valid DSA profile";
             }
-            break
+            break;
         }
         setFieldErrors(errors)
         return Object.keys(errors).length === 0
@@ -187,6 +216,9 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
                                 </label>
                                 <input type="text" id={input.id} name={input.id} value={formData.development[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300"}`} placeholder={input.placeholder}/>
                                 {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
+                                {githubStatus === "checking" && <p className="text-blue-500 text-sm mt-3">Checking...</p>}
+                                {githubStatus === "valid" && <p className="text-green-600 text-sm mt-3">GitHub verified ✓</p>}
+                                {githubStatus === "invalid" && <p className="text-red-500 text-sm mt-3">GitHub user not found</p>}
                             </div>
                         )
                     })}
@@ -198,6 +230,7 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
                     <h2 className="text-2xl font-bold text-blue-800 mb-2">Coding Profiles</h2>
                     <p className="text-sm text-blue-600 mb-6">Provide at least one profile (LeetCode or Codeforces)</p>
                     {codingProfilesFields.map((input) => {
+                        const status = input.id === "leetcode"? leetcodeStatus: input.id === "codeforces"? codeforcesStatus: "idle"
                         return (
                             <div key={input.id}>
                                 <label htmlFor={input.id} className="block text-blue-700 font-semibold mb-2">
@@ -205,6 +238,9 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
                                 </label>
                                 <input type="text" id={input.id} name={input.id} value={formData.codingProfiles[input.id]} onChange={changeHandler} className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-blue-50 text-blue-900 ${fieldErrors[input.id] ? "border-red-300" : "border-blue-300"}`} placeholder={input.placeholder}/>
                                 {fieldErrors[input.id] && <p className="text-red-500 text-sm mt-1">{fieldErrors[input.id]}</p>}
+                                {status === "checking" && <p className="text-blue-500 text-sm mt-3">Checking...</p>}
+                                {status === "valid" && <p className="text-green-600 text-sm mt-3">Verified ✓</p>}
+                                {status === "invalid" && <p className="text-red-500 text-sm mt-3">User not found</p>}
                             </div>
                         )
                     })}
@@ -263,11 +299,11 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
                                     Previous Step
                                 </button>
                                 {currentStep < totalSteps ? (
-                                    <button type="button" onClick={nextStep} disabled={isFetching} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
+                                    <button type="button" onClick={nextStep} disabled={isFetching || githubStatus === "checking"} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
                                         Continue
                                     </button>
                                     ) : (
-                                    <button type="button" onClick={submitHandler} disabled={isLoading || isFetching} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg flex items-center justify-center text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
+                                    <button type="button" onClick={submitHandler} disabled={isLoading || isFetching || leetcodeStatus === "checking" || codeforcesStatus === "checking"} className="px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition-all shadow-lg flex items-center justify-center text-sm sm:text-base disabled:cursor-not-allowed disabled:opacity-50">
                                         {isLoading? (
                                             <>
                                                 <LoadingSpinner />

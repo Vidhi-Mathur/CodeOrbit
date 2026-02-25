@@ -1,13 +1,13 @@
 import { CodeForcesContestInterface, CodeForcesDataInterface, CodeForcesErrorInterface, CodeForcesProfileInterface, ProblemBreakdownInterface } from "@/interfaces/dsa/codeforces/codeforcesInterface";
 import axios from "axios";
 import { unstable_cache } from "next/cache";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
+const headers = {
+    "User-Agent": "Mozilla/5.0",
+}
 
 const fetchCodeForcesData = async(codeforces_username: string): Promise<CodeForcesDataInterface> => {
-    const headers = {
-            "User-Agent": "Mozilla/5.0",
-        }
         const [profileRes, contestRes, problemBreakdownRes] = await Promise.allSettled([
             axios.get(`https://codeforces.com/api/user.info?handles=${codeforces_username}`, { headers }),
             axios.get(`https://codeforces.com/api/user.rating?handle=${codeforces_username}`, { headers }),
@@ -64,7 +64,6 @@ const fetchCodeForcesData = async(codeforces_username: string): Promise<CodeForc
             errors.contest = contestRes.reason?.message || 'Failed to fetch contest';
         }
 
-
         if(problemBreakdownRes.status === "fulfilled"){
             const problemBreakdownData = problemBreakdownRes.value.data.result
             if(problemBreakdownData){
@@ -110,6 +109,11 @@ const fetchCodeForcesData = async(codeforces_username: string): Promise<CodeForc
 }
 
 
+const verifyCodeForces = async(codeforces_username: string) => {
+    const verificationResponse = await axios.get(`https://codeforces.com/api/user.info?handles=${codeforces_username}`, { headers })
+    return verificationResponse.data?.status === "OK"
+}
+
 const getCachedCodeForcesData = (codeforces_username: string) => unstable_cache(() => 
     fetchCodeForcesData(codeforces_username), [`codeforces-${codeforces_username}`], {
         revalidate:  3600,
@@ -121,14 +125,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     const { codeforces_username } = await params
 
     if(!codeforces_username){
-        return Response.json({ error: "Codeforces username is required" }, { status: 400 });
+        return NextResponse.json({ error: "Codeforces username is required" }, { status: 400 });
     }
 
     try {
+        const verifyMode = req.nextUrl.searchParams.get("verify") === "true"
+        if(verifyMode){
+            const isValid = await verifyCodeForces(codeforces_username)
+            if(!isValid){
+                return NextResponse.json({ valid: false, message: "Codeforces user not found" }, { status: 404 })
+            }
+            return NextResponse.json({ valid: true }, { status: 200 });
+        }
         const { profileResponse, contestResponse, problemBreakdownResponse, errors } = await getCachedCodeForcesData(codeforces_username)()
-        return Response.json({ profileResponse, contestResponse, problemBreakdownResponse, errors }, { status: 200 })
+        return NextResponse.json({ profileResponse, contestResponse, problemBreakdownResponse, errors }, { status: 200 })
     }
     catch(err: any){
-        return Response.json({ error: "Failed to fetch Codeforces profile data" }, { status: 500 })
+        return NextResponse.json({ error: "Failed to fetch Codeforces profile data" }, { status: 500 })
     }
 }

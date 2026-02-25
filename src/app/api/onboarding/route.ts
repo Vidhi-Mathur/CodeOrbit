@@ -30,7 +30,13 @@ export async function POST(req: NextRequest) {
         const { basicDetails, education, codingProfiles, development, social } = parsed.data
         const existingUsername = await User.findOne({ username: basicDetails.username, email: { $ne: session.user.email }})
         if(existingUsername){
-            return NextResponse.json({ message: "Username already taken" }, { status: 409 })
+            return NextResponse.json({
+                errors: {
+                    fieldErrors: {
+                        username: "Username already taken"
+                    }
+                }
+            }, { status: 409 })
         }
         removeEmptyStrings(education)
         removeEmptyStrings(social)
