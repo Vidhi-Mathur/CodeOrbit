@@ -116,14 +116,22 @@ export const ProfileForm = ({mode, onSubmit, initialData = initialFormData, isFe
         try {
             await onSubmit(formData)
         } 
-        catch(err){
-            if(axios.isAxiosError(err) && err.response?.data?.errors?.fieldErrors){
-                const backendErrors = err.response.data.errors.fieldErrors
-                setFieldErrors(backendErrors)
-                //Todo: Auto navigate to step
-                const firstErrorField = Object.keys(backendErrors)[0]
-                const stepIndex = stepConfig.findIndex(step => step.fields.some(field => field.id === firstErrorField))
-                if(stepIndex !== -1) setCurrentStep(stepIndex + 1)
+        catch(err: any){
+            if(axios.isAxiosError(err)){
+                const fieldErrors = err.response?.data?.errors?.fieldErrors
+                const formErrors = err.response?.data?.errors?.formErrors
+                if(fieldErrors){
+                    setFieldErrors(fieldErrors)
+                    //Auto navigate to step
+                    const firstErrorField = Object.keys(fieldErrors)[0]
+                    const stepIndex = stepConfig.findIndex(step => step.fields.some(field => field.id === firstErrorField))
+                    if(stepIndex !== -1) setCurrentStep(stepIndex + 1)
+                }
+                if(formErrors){
+                    setError(formErrors[0])
+                    return
+                }
+                
             } 
             else setError("Something went wrong. Try again.")
         } 

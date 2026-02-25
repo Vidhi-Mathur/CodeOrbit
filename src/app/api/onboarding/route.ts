@@ -8,8 +8,12 @@ import { removeEmptyStrings } from "@/lib/helper"
 
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
-    if(!session?.user?.email) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    if(!session?.user?.email){
+        return NextResponse.json({
+            errors: {
+                formErrors: ["Unauthorized"]
+            }
+        }, { status: 401 })
     }
     await connectToDB()
     const body = await req.json()
@@ -52,7 +56,11 @@ export async function POST(req: NextRequest) {
         }, { new: true })
         return NextResponse.json({ message: "User onboarded successfully", user: updatedUser }, { status: 200 })
     } 
-    catch(err){
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+    catch(err: any){
+        return NextResponse.json({
+            errors: {
+                formErrors: ["Internal Server Error"]
+            }
+        }, { status: 500 })
     }
 }

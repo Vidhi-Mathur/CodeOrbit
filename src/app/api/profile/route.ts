@@ -9,21 +9,32 @@ import { removeEmptyStrings } from "@/lib/helper"
 export async function GET() {
     const session = await getServerSession(authOptions)
     if(!session){
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        return NextResponse.json({
+            errors: {
+                formErrors: ["Unauthorized"]
+            }
+        }, { status: 401 })
     }
     await connectToDB()
     const user = await User.findOne({ email: session.user.email }).select("name email image username education platforms")
     if(!user){
-        return NextResponse.json({ error: "User not found" }, { status: 404 })
+        return NextResponse.json({
+            errors: {
+                formErrors: ["User not found"]
+            }
+        }, { status: 404 })
     }
     return NextResponse.json(user)
 } 
 
-
 export async function PUT(req: NextRequest) {
     const session = await getServerSession(authOptions)
-    if(!session?.user?.email) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    if(!session?.user?.email){
+        return NextResponse.json({
+            errors: {
+                formErrors: ["Unauthorized"]
+            }
+        }, { status: 401 })
     }
     await connectToDB()
     const body = await req.json()
@@ -67,7 +78,11 @@ export async function PUT(req: NextRequest) {
         const updatedUser = await User.findOneAndUpdate({ email: session.user.email }, { $set: updatedFields }, { new: true })
         return NextResponse.json({ message: "User updated successfully", user: updatedUser }, { status: 200 })
     } 
-    catch(err){
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+    catch(err: any){
+        return NextResponse.json({
+            errors: {
+                formErrors: ["Internal Server Error"]
+            }
+        }, { status: 500 })
     }
 }
