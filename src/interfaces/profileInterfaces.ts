@@ -53,7 +53,8 @@ export interface ProfileHeaderProps {
     activeTab: ProfileTabs
     onTabChange: (tab: ProfileTabs) => void
     onRefresh: () => void
-    refreshState: RefreshInterface
+    refreshState: RefreshInterface,
+    lastSynced?: number
 }
 
 export interface ProfileFormProps {

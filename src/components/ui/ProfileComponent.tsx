@@ -67,15 +67,27 @@ const ProfileComponent = ({ user }: ProfileComponentProps) => {
         } 
         finally {
             setTimeout(() => {
-                setRefreshState({ status: "idle" })
+                setRefreshState(prev => ({
+                    ...prev,
+                    status: "idle",
+                    message: undefined
+                }))
             }, 2500)
         }
     }
 
+    const username = getUsername(activePlatform)
+    const queryState = queryClient.getQueryState([
+        activePlatform,
+        username
+    ])
+
+    const lastSynced = queryState?.dataUpdatedAt
+
     return (
     <div className="flex flex-col lg:flex-row h-screen w-full overflow-y-auto scrollbar-hide">
         <div className="flex flex-col w-full lg:w-3/4">
-            <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} onRefresh={refreshHandler} refreshState={refreshState} />
+            <ProfileHeader user={user} activeTab={activeTab} onTabChange={tabChangeHandler} onRefresh={refreshHandler} refreshState={refreshState} lastSynced={lastSynced} />
             <div className="bg-blue-200 flex-1 lg:h-[calc(3/4*100vh)] overflow-y-auto scrollbar-hide">
                 {activeTab === PROFILE_TABS.PROBLEM_SOLVING && (
                     <DSASection user={user} activePlatform={activePlatform} onPlatformChange={platformChangeHandler} />

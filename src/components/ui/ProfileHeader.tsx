@@ -2,7 +2,7 @@ import type { ProfileHeaderProps } from "@/interfaces/profileInterfaces"
 import { About } from "@/components/ui/About"
 import { CurvedNav } from "@/components/ui/CuvedNav"
 
-export const ProfileHeader = ({ user, activeTab, onTabChange, onRefresh, refreshState }: ProfileHeaderProps) => {
+export const ProfileHeader = ({ user, activeTab, onTabChange, onRefresh, refreshState, lastSynced }: ProfileHeaderProps) => {
     return (
         <div className="relative p-3 sm:p-4 lg:p-6 bg-white lg:h-[calc(5/12*100vh)] pt-[72px] sm:pt-[70px] lg:pt-[80px] pb-16 sm:pb-16 lg:pb-0">  
             <div className="flex flex-col lg:block">
@@ -15,6 +15,11 @@ export const ProfileHeader = ({ user, activeTab, onTabChange, onRefresh, refresh
                         <span className={`text-xs px-3 py-1 rounded-full ${refreshState.status === "success"? "bg-green-100 text-green-700": "bg-red-100 text-red-700"}`}>
                             {refreshState.message}
                         </span>
+                    )}
+                    {lastSynced && (
+                        <p className="text-[11px] text-gray-500">
+                            Last synced: {new Date(lastSynced).toLocaleString()}
+                        </p>
                     )}
                 </div>
             </div>
