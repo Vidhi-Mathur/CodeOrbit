@@ -4,7 +4,7 @@ import { useGithubQuery } from "@/hooks/useGitHub"
 import DevStats from "@/components/dev/DevStats"
 import { GitHubProfile } from "@/components/dev/github/GitHubProfile"
 import { GitHubRepo } from "@/components/dev/github/GitHubRepo"
-import { ShimmerProfile, ShimmerRepo, ShimmerCalendar } from "@/components/ui/ShimmerUI"
+import { ShimmerProfile, ShimmerRepo, ShimmerOuterCalendar } from "@/components/ui/ShimmerUI"
 import { GitHubCalendar } from "./github/GitHubCalendar"
 
 export const DevSection = ({ user, activePlatform, onPlatformChange, renderSidebarOnly = false }: SectionProps) => {
@@ -30,7 +30,7 @@ export const DevSection = ({ user, activePlatform, onPlatformChange, renderSideb
     if(renderSidebarOnly){
         return (
             <>
-            {githubLoading && <ShimmerCalendar />}
+            {githubLoading && <ShimmerOuterCalendar />}
             {githubApiError?.calendar ? (
                 <div className="bg-red-50 p-3 sm:p-4 ml-2 mr-2 rounded-lg border border-red-200 text-red-700 text-sm sm:text-base">
                     {githubApiError?.calendar || "Failed to load contribution calendar"}

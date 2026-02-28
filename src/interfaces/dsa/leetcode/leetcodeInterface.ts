@@ -15,7 +15,8 @@ export interface LeetCodeProfileProps {
 }
 
 export interface SubmissionCalendarProps {
-  calendarMap: Record<number, LeetCodeCalendarInterface>
+  calendarMap: Record<number, LeetCodeCalendarInterface>,
+  username: string
 }
 
 export interface LeetCodeCalendarInterface {

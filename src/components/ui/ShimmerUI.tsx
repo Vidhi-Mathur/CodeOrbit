@@ -78,22 +78,31 @@ export const ShimmerRepo = () => {
     )
 }
 
-export const ShimmerCalendar = () => {
+//Heading + Inner
+export const ShimmerOuterCalendar = () => {
     return (
-    <div className="bg-white rounded-xl shadow-sm border relative m-4">
-        <div className="mb-4">
-            <div className="bg-[#1A1B2E] px-5 py-4 rounded-md mb-4">
-                <ShimmerEffect className="h-6 w-40 bg-gray-600 rounded" />
+        <div className="bg-white rounded-xl shadow-sm border relative m-4">
+            <div className="mb-4">
+                <div className="bg-[#1A1B2E] px-5 py-4 rounded-md mb-4">
+                    <ShimmerEffect className="h-6 w-40 bg-gray-600 rounded" />
+                </div>
+                <ShimmerInnerCalendar />
             </div>
-            <div className="grid grid-cols-3 gap-4 text-sm px-4">
-                {[...Array(3)].map((_, index) => (
-                    <div key={index} className="flex flex-col items-center gap-1 text-center">
-                        <ShimmerEffect className="w-10 h-10 bg-gray-200 rounded-lg" />
-                        <ShimmerEffect className="h-5 w-8 bg-gray-300 rounded mt-1" />
-                        <ShimmerEffect className="h-3 w-20 bg-gray-200 rounded mt-1" />
-                    </div>
-                ))}
-            </div>
+        </div>
+    )
+}
+
+export const ShimmerInnerCalendar = () => {
+    return (
+        <>
+        <div className="grid grid-cols-3 gap-4 text-sm px-4">
+            {[...Array(3)].map((_, index) => (
+                <div key={index} className="flex flex-col items-center gap-1 text-center">
+                    <ShimmerEffect className="w-10 h-10 bg-gray-200 rounded-lg" />
+                    <ShimmerEffect className="h-5 w-8 bg-gray-300 rounded mt-1" />
+                    <ShimmerEffect className="h-3 w-20 bg-gray-200 rounded mt-1" />
+                </div>
+            ))}
         </div>
         <div className="mb-4 px-4 m-2">
             <ShimmerEffect className="h-4 w-8 bg-gray-300 rounded mb-2" />
@@ -117,7 +126,7 @@ export const ShimmerCalendar = () => {
                 ))}
             </div>
         </div>
-    </div>
+        </>
     )
 }
 

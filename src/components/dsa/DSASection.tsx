@@ -1,5 +1,5 @@
 import DSAStats from "./DSAStats"
-import { ShimmerCalendar, ShimmerContest, ShimmerProfile } from "../ui/ShimmerUI"
+import { ShimmerOuterCalendar, ShimmerContest, ShimmerProfile } from "../ui/ShimmerUI"
 import type { SectionProps } from "@/interfaces/profileInterfaces"
 import { type DsaLink, DSA_LINKS } from "@/constants/profileConstant"
 import { useLeetcodeQuery } from "@/hooks/useLeetCode"
@@ -41,7 +41,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
             <>
             {leetcodeLoading && (
                 <>
-                <ShimmerCalendar />
+                <ShimmerOuterCalendar />
                 <ShimmerContest />
                 </>
             )}
@@ -54,12 +54,7 @@ export const DSASection = ({ user, activePlatform, onPlatformChange, renderSideb
                     ): (
                         leetcodeCalendar && (
                             <div className="p-2 sm:p-3">
-                        <LeetCodeCalendar
-                            calendarMap={
-                                typeof leetcodeCalendar === "object" && "submissionCalendar" in leetcodeCalendar
-                                ? { [new Date().getFullYear()]: leetcodeCalendar }
-                                : leetcodeCalendar}
-                                />
+                        <LeetCodeCalendar calendarMap={leetcodeCalendar} username={leetcodeUsername} />
                     </div>
                 ))}
                 {leetcodeApiErrors?.contest ? (

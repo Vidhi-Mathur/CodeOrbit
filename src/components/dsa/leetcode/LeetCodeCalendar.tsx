@@ -7,6 +7,8 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment"
 import type { SubmissionCalendarProps } from "@/interfaces/dsa/leetcode/leetcodeInterface"
 import { formatDate, generateDates, getIntensity, groupDatesByMonth } from "@/lib/helper"
 import { ToolTip } from "../../ui/ToolTip"
+import { useLeetcodeCalendarQuery } from "@/hooks/useLeetCode"
+import { ShimmerInnerCalendar } from "@/components/ui/ShimmerUI"
 
 const tooltipContent = (date: Date, count: number) => {
     return (
@@ -21,14 +23,20 @@ const tooltipContent = (date: Date, count: number) => {
     )
 }
 
-export const LeetCodeCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
-    const allYears = Object.keys(calendarMap).map(Number).sort((a, b) => b - a)
+export const LeetCodeCalendar = ({ calendarMap, username }: SubmissionCalendarProps) => {
+    const allYears = useMemo(() => {
+        const yearsFromMap = Object.keys(calendarMap).map(Number)
+        const activeYears = calendarMap[yearsFromMap[0]]?.activeYears || yearsFromMap
+        return activeYears.sort((a, b) => b - a)
+    }, [calendarMap])
 
     //To select year
-    const [selectedYear, setSelectedYear] = useState<number | null>(allYears.length > 0 ? allYears[0] : null)
+    const [selectedYear, setSelectedYear] = useState<number>(allYears[0])
+
+    const { data, isFetching } = useLeetcodeCalendarQuery(username, selectedYear, calendarMap)
 
     //For current year
-    const currentYearCalendar = selectedYear? calendarMap[selectedYear]: null
+    const currentYearCalendar = calendarMap[selectedYear] || data?.submissionCalendarResponse?.[selectedYear] || null
 
     const submissionCalendar = currentYearCalendar?.submissionCalendar ?? "{}";
     const totalActiveDays = currentYearCalendar?.totalActiveDays ?? 0;
@@ -44,7 +52,6 @@ export const LeetCodeCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
             return {}
         }
     }, [submissionCalendar])
-
     
 
     //Get dates for the selected year
@@ -80,11 +87,13 @@ export const LeetCodeCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
                     Submission Activity
                 </h3>
             </div>
-            {!currentYearCalendar? (
+            {isFetching && !currentYearCalendar && <ShimmerInnerCalendar/>}
+            {!isFetching && !currentYearCalendar && (
                 <div className="flex items-center justify-center h-24 sm:h-32 md:h-40 lg:h-48">
                     <p className="text-gray-500 text-sm sm:text-base md:text-sm lg:text-base">💡No submission data available for this year!!!</p>
                 </div>
-            ): (
+            )}
+            {!isFetching && currentYearCalendar && (
                 <>
                 <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-3 lg:gap-4 text-xs sm:text-sm md:text-sm lg:text-sm px-2 sm:px-3 md:px-3 lg:px-4">
                     <div className="flex flex-col items-center gap-1 text-center">
@@ -170,4 +179,3 @@ export const LeetCodeCalendar = ({ calendarMap }: SubmissionCalendarProps) => {
     </div>
     )
 }
-
