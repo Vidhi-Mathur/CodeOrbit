@@ -47,7 +47,7 @@ const contestQuery = `
     }
 `;
 
-export const calendarQuery = `
+const calendarQuery = `
     query userProfileCalendar($username: String!, $year: Int) {
         matchedUser(username: $username) {
             userCalendar(year: $year) {

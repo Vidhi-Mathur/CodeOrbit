@@ -2,7 +2,19 @@ import type { LeetCodeCalendarInterface } from '@/interfaces/dsa/leetcode/leetco
 import axios from 'axios'
 import { unstable_cache } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
-import { calendarQuery } from '../route';
+
+const calendarQuery = `
+    query userProfileCalendar($username: String!, $year: Int) {
+        matchedUser(username: $username) {
+            userCalendar(year: $year) {
+                activeYears
+                streak
+                totalActiveDays
+                submissionCalendar
+            }
+        }
+    }
+`
 
 const fetchLeetcodeCalendar = async(leetcode_username: string, year: number): Promise<{ submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null>, error?: string }> => {
     const headers = {
