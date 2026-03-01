@@ -16,7 +16,7 @@ const calendarQuery = `
     }
 `
 
-const fetchLeetcodeCalendar = async(leetcode_username: string, year: number): Promise<{ submissionCalendarResponse: Record<number, LeetCodeCalendarInterface | null>, error?: string }> => {
+const fetchLeetcodeCalendar = async(leetcode_username: string, year: number): Promise<{ submissionCalendarResponse: Record<number, LeetCodeCalendarInterface>, error?: string }> => {
     const headers = {
         'Content-Type': 'application/json',
         Referer: `https://leetcode.com/${leetcode_username}/`,

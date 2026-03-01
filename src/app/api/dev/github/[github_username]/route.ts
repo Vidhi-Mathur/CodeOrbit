@@ -152,37 +152,38 @@ const fetchGitHubData = async(github_username: string): Promise<GitHubDataInterf
     }
     const reposResponse = Array.from(reposMap.values()).slice(0, 6)
 
-    //Determine active years (based on createdAt)
     const createdYear = new Date(user.createdAt).getFullYear()
     const currentYear = new Date().getFullYear()
+
     const activeYears: number[] = []
-    for(let y = currentYear; y >= createdYear && activeYears.length < 5; y--){
+    for(let y = currentYear; y >= createdYear && activeYears.length < 5; y--) {
         activeYears.push(y)
     }
-    //Fetch contribution calendars per year
-    const calendarPromises = activeYears.map((year) => {
-        const now = new Date()
-        const from = `${year}-01-01T00:00:00Z`
-        //only up to today if current year
-        const to = year === now.getFullYear()? now.toISOString(): `${year}-12-31T23:59:59Z`
-        return axios.post('https://api.github.com/graphql', { query: calendarQuery, variables: { github_username, from, to}}, { headers })})
-    const calendarResults = await Promise.allSettled(calendarPromises)
-    const calendarMap: Record<number, { totalContributions: number, weeks: any[] }> = {}
-    calendarResults.forEach((res, index) => {
-        if(res.status === 'fulfilled'){
-            const year = activeYears[index]
-            const cal = res.value.data?.data?.user?.contributionsCollection?.contributionCalendar
-            calendarMap[year] = {
-                totalContributions: cal?.totalContributions || 0,
-                weeks: cal?.weeks || []
-            }
+
+    const from = `${currentYear}-01-01T00:00:00Z`
+    //only up to today if current year
+    const to = new Date().toISOString()
+
+    const calendarRes = await axios.post('https://api.github.com/graphql', { 
+        query: calendarQuery, 
+        variables: { 
+            github_username, 
+            from, 
+            to
         }
-        else errors.calendar = res.reason?.message || `Failed to fetch calendar for ${activeYears[index]}`
-    })
-    const calendarResponse = {
-        activeYears: [...activeYears].sort((a, b) => a - b),
-        contributionCalendarResponse: calendarMap,
+    }, { headers })
+
+    const calendarMap: Record<number, { totalContributions: number, weeks: any[] }> = {}
+    const cal = calendarRes.data?.data?.user?.contributionsCollection?.contributionCalendar
+    calendarMap[currentYear] = {
+        totalContributions: cal?.totalContributions || 0,
+        weeks: cal?.weeks || []
     }
+    const calendarResponse = {
+        activeYears,
+        contributionCalendarResponse: calendarMap
+    }
+
     return { profileResponse, reposResponse, calendarResponse, errors }
 }
 

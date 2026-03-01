@@ -37,7 +37,7 @@ export const DevSection = ({ user, activePlatform, onPlatformChange, renderSideb
                 </div>
             ): calendar && (
                 <div className="p-2 sm:p-3">
-                    <GitHubCalendar contributions={calendar} />
+                    <GitHubCalendar contributions={calendar} username={user.platforms.dev.github} />
                 </div>
             )} 
             </>

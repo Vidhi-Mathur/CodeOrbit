@@ -45,7 +45,8 @@ export interface GitHubCalendarInterface {
 }
 
 export interface GitHubCalendarProps {
-    contributions: GitHubCalendarInterface
+    contributions: GitHubCalendarInterface,
+    username: string
 }
 
 export interface GithubErrorInterface {
