@@ -1,53 +1,79 @@
-
 # CodeOrbit
 
-**CodeOrbit** is a modern, fully‑responsive developer portfolio and project showcase platform that provides a sleek, interactive interface for developers to present their coding profiles, education, and project work in a structured and visually appealing way.
+**CodeOrbit** is a performance-optimized developer analytics platform that aggregates and visualizes coding activity from multiple platforms (GitHub, LeetCode, Codeforces as of now) into a unified, cache-aware public profile.
+It is designed with layered caching, real-time verification, resilient API handling, and lazy-loaded data orchestration to ensure performance, reliability, and scalability.
 
 
 ## Features
 
 - **Onboarding Workflow**  
-  - Multi-step form with step-wise validation to capture basic info, social links, education, and coding profiles.
+  - Step-based onboarding pipeline capturing personal, educational, social, development, and coding profiles.
+  - Backend-enforced validation using Zod.
+  - Field-level error mapping with automatic step navigation.
+  - Edit mode with secure profile rehydration.
+  - Lightweight `?verify=true` platform verification endpoints for GitHub, LeetCode and Codeforces.
+  - Debounced real-time username validation to prevent invalid integrations.
 
-- **Dynamic User Profiles**  
-  - Auto-generated public profile pages combining bio, education, social links, and coding stats/activity.
+- **Dynamic User Profiles & Multi-Platform Developer Analytics**  
+  - Auto-generated public profiles combining bio, education, social links, and coding activity.
+    - GitHub: Profile data, pinned + recent repos (deduplicated), multi-year contribution calendar.
+    - LeetCode: Profile stats, contest ranking, submission distribution, language breakdown.
+    - Codeforces: Rating progression, contest history, difficulty-tier segmentation.
+  - Visual heatmap representing yearly developer activity.
+  - Custom GraphQL queries with structured transformation into normalized REST-style APIs.
+  
+- **Performance Optimizations through caching and lazy loading**
+  - Client-side caching with TanStack React Query and Server-side caching with Next.js unstable_cache.
+  - Controlled query invalidation and background revalidation.
+  - Manual refresh endpoint for platform data, rate limited via Upstash to prevent abuse and excessive external API calls.
+  - Year-based lazy loading: current year fetched first, historical years loaded on demand, reducing API fan-out and initial payload size.
+  - Indexed frequently queried fields for optimized profile lookup performance
 
-- **Submission Activity Calendar**  
-  - Visual heatmap showcasing your yearly developer activity across multiple platforms.
+- **Resilient & Defensive API Design**
+  - Partial failure handling using safe async orchestration.
+  - Graceful fallback to cached data.
+  - Standardized error contracts with proper HTTP status codes.
+  - Defensive handling of third-party API inconsistencies.
 
-- **Integrated Developer Data**
-    - Custom GraphQL queries written from scratch to fetch coding profile data (e.g., stats, contests, submissions).
-    - Responses transformed into REST-style APIs for clean frontend consumption and reusable hooks.
-
-- **Authentication**  
-  - Secure sign‑in and session management for efficient onboarding for new users.
+- **Authentication & Access Control**
+  - Secure sign-in using NextAuth (OAuth + credentials).
+  - Session-based route protection.
+  - Owner-only profile editing and refresh controls.
 
 - **Responsive Design**  
-  - Mobile‑first layouts, smooth animations, and optimized loading states.
+  - Mobile-first layouts.
+  - Stable loading states without UI flicker.
+  - Controlled rendering during verification and async data fetch.
 
 
 ## Routes Overview
 
 ### Pages
 
-| Route                  | Auth Required | Description                             |
-|------------------------|----------------|-----------------------------------------|
-| `/`                   | ❌             | Landing/Homepage                        |
-| `/onboarding`         | ✅  (after signup)           | Multi-step onboarding form              |
-| `/login`              | ❌             | Login page with credentials or OAuth    |
-| `/signup`             | ❌             | Signup page or flow for new users       |
-| `/profile/[username]` | ❌             | Public user profile page (dynamic)      |
-
----
+| Route                  | Auth Required        | Description                                      |
+|------------------------|---------------------|--------------------------------------------------|
+| `/`                    | ❌                  | Landing / Homepage                               |
+| `/onboarding`          | ✅ (after signup)   | Multi-step onboarding pipeline                   |
+| `/login`               | ❌                  | Login via credentials or OAuth                   |
+| `/signup`              | ❌                  | New user registration                            |
+| `/profile/[username]`  | ❌                  | Public dynamic developer profile                 |
+| `/profile/edit`        | ✅ (owner only)     | Edit profile details and manage platform links   |
 
 ### API Routes
 
-| Route                                                    | Method  | Description                                     |
-|-----------------------------------------------------------|---------|-------------------------------------------------|
-| `/api/profile/leetcode/[leetcode_username]`              | `GET`   | Fetch LeetCode stats for a specific user        |
-| `/api/profile/github/[github_username]`                  | `GET`   | Fetch GitHub profile data for a specific user   |
-| `/api/onboarding`                                        | `POST`  | Submit onboarding form data                     |
-| `/api/auth/[...nextauth]`                                | `ALL`   | Handles all NextAuth.js authentication routes   |
+| Route                                                          | Method                       | Description |
+|----------------------------------------------------------------|------------------------------|-------------|
+| `/api/auth/[...nextauth]`                                      | `ALL`                        | NextAuth authentication handler (OAuth + credentials) |
+| `/api/onboarding`                                              | `POST`                       | Submit validated multi-step onboarding data |
+| `/api/profile`                                                 | `GET` (owner only)           | Fetch authenticated user's profile data (edit mode rehydration) |
+| `/api/profile`                                                 | `PUT` (owner only)           | Update profile details and connected platforms |
+| `/api/dsa/leetcode/[username]`                                 | `GET`                        | Fetch structured LeetCode analytics (profile, contests, current-year calendar) |
+| `/api/dsa/leetcode/[username]/calendar?year=YYYY`              | `GET`                        | Fetch LeetCode submission calendar for specific year (lazy-loaded) |
+| `/api/dsa/codeforces/[username]`                               | `GET`                        | Fetch Codeforces analytics (profile, rating history, solved breakdown) |
+| `/api/dev/github/[username]`                                   | `GET`                        | Fetch GitHub analytics (profile, repos, current-year calendar) |
+| `/api/dev/github/[username]/calendar?year=YYYY`                | `GET`                        | Fetch GitHub contribution calendar for specific year (lazy-loaded) |
+| `/api/refresh`                                                 | `POST`                       | Trigger controlled cache revalidation for a specific platform |
+
 
 ## Project Structure
 
@@ -70,6 +96,7 @@
   - `lib` - Utility functions, model schemas, and auth configurations.
 - `middleware.ts` - Application middleware logic.
 - `.env` 
+
 
 ## Installation
 
@@ -96,14 +123,18 @@
     SECRET_KEY=<your-secret-key>         
     GITHUB_AUTH_KEY=<your-github-auth-key> 
     MONGODB_URI=<your-mongodb-uri>
+    UPSTASH_REDIS_REST_URL=<your-upstash-redis-rest-url>
+    UPSTASH_REDIS_REST_TOKEN=<your-upstash-redis-rest-token>
     ```    
 4. Start the server
     ```bash
    npm run dev
     ```
-    
+
+
 ## Usage
 - Once started, visit http://localhost:3000 to view the application.
+
 
 ## Tech Stack
 
@@ -112,6 +143,7 @@
 - [React](https://reactjs.org/) (v19.0.0)  
 - [TypeScript](https://www.typescriptlang.org/) (v5)  
 - [Tailwind CSS](https://tailwindcss.com/) (v4.1.8)  
+- [Chart.js](https://www.chartjs.org/) (v4.5.0)
 - [Material UI](https://mui.com/) (v7.1.0)  
 - [React Slick](https://react-slick.neostack.com/) (v0.30.3)
 
@@ -120,10 +152,15 @@
 - Auth Providers: Google, GitHub, Twitter, Custom Credentials 
 - [Bcryptjs](https://www.npmjs.com/package/bcryptjs) (v3.0.2) 
 
-### API & Data Layer
-- [GraphQL](https://graphql.org/)  
+### Backend and API Layer
+- [GraphQL](https://graphql.org/) 
 - [Axios](https://axios-http.com/) (v1.9.0) 
+- [Zod](https://zod.dev/) (v4.3.6)
 
 ### Database
 - [MongoDB](https://www.mongodb.com/)  
 - [Mongoose](https://mongoosejs.com/) (v8.15.0)  
+
+### Caching 
+- [Tanstack React Query](https://tanstack.com/query/latest) (v5.90.21)
+- [Upstash](https://upstash.com/) (v1.36.2)
