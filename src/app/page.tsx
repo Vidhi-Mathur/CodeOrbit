@@ -80,9 +80,13 @@ export default function Home() {
                     </div>
                 </div>
                 <div className="border-t border-blue-800 mt-6 pt-8 flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-blue-300 font-medium">
+                    <p className="text-blue-300 font-medium whitespace-nowrap">
                         &copy; {new Date().getFullYear()} CodeOrbit. All rights reserved.
                     </p>
+                    <Link href="/profile/vidhi_mathur" target="_blank" rel="noopener noreferrer"className="inline-flex items-center gap-2 hover:from-blue-600 hover:to-cyan-600 text-white px-4 py-2 rounded-full font-semibold text-sm transition-all duration-200 hover:shadow-lg">
+                        Built by Vidhi Mathur ❤️
+                        <ArrowForwardIcon style={{ fontSize: "14px" }} />
+                    </Link>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         {["Privacy Policy", "Terms of Service"].map((text) => (
                             <Link href="/" key={text} className="text-blue-300 hover:text-white transition-colors">
