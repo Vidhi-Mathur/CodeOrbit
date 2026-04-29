@@ -4,6 +4,12 @@
 It is designed with layered caching, real-time verification, resilient API handling, and lazy-loaded data orchestration to ensure performance, reliability, and scalability.
 
 
+## Live Demo
+
+- 🌐 App: https://codeorbit-coral.vercel.app  
+- 👤 Sample Profile: https://codeorbit-coral.vercel.app/profile/vidhi_mathur
+
+
 ## Features
 
 - **Onboarding Workflow**  
