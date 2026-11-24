@@ -89,6 +89,10 @@ export const SideBar = ({name, username, image}: SideBarProps) => {
                         <EditIcon className="mr-2"/>
                         Edit your Profile
                     </Link>
+                    <Link href={session?.user.isOnboarded? `/profile/${username}/review` : "/onboarding"} className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150" onClick={closeSidebar} role="menuitem">
+                        <PersonIcon className="mr-2"/>
+                        Generate Review
+                    </Link>
                     <button onClick={logoutHandler} className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 text-left cursor-pointer" role="menuitem">
                         <LogoutIcon className="mr-2"/>
                         Logout

@@ -93,3 +93,17 @@ export interface PlatformStateProps {
     title: string, 
     message: string
 }
+
+export interface ProfileReview {
+    summary: string,
+    strengths: string[],
+    skillGaps: string[]
+    readinessScore: number,
+    nextSteps: string[],
+    roadmap: {
+        week1: string[],
+        week2: string[],
+        week3: string[],
+        week4: string[]
+    };
+}
